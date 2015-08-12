@@ -5,6 +5,8 @@
 class Foldalign {
     public:
         Foldalign(const std::string &s1, const std::string &s2, const int lambda, const int delta);
+        bool outOfBorder_j(const int j);
+        bool outOfBorder_l(const int l);
         int fold_align();
     private:
         std::string m_seq1;
