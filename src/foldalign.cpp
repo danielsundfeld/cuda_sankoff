@@ -6,23 +6,23 @@ Foldalign::Foldalign(const std::string &s1, const std::string &s2,
                      const int lambda, const int delta)
 {
     m_seq1 = s1;
-    m_seq1_l = m_seq1.length();
+    m_seq1_l = (int) m_seq1.length(); //TODO: throw exception if negative
     m_seq2 = s2;
-    m_seq2_l = m_seq2.length();
+    m_seq2_l = (int) m_seq2.length();
     m_lambda = lambda;
     m_delta = delta;
 }
 
 bool Foldalign::outOfBorder_lambda(const int j)
 {
-    if ((unsigned int)j >= m_seq1_l)
+    if (j >= m_seq1_l)
         return true;
     return false;
 }
 
 bool Foldalign::outOfBorder_delta(const int l)
 {
-    if (l < 0 || (unsigned int)l >= m_seq2_l)
+    if (l < 0 || l >= m_seq2_l)
         return true;
     return false;
 }
@@ -41,11 +41,11 @@ int Foldalign::fold_align()
     {
         for (int k = m_seq2_l - 1; k >= 0; --k)
         {
-            for (unsigned int j = 0; j < m_seq1_l; ++j) //TODO: lambda
+            for (int j = 0; j < m_seq1_l; ++j) //TODO: lambda
             {
                 if (outOfBorder_lambda(j))
                     continue;
-                for (unsigned int l = 0; l < m_seq2_l; ++l) //TODO: delta
+                for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
                 {
                     if (outOfBorder_delta(l))
                         continue;

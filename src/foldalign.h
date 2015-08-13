@@ -14,9 +14,9 @@ class Foldalign {
         int fold_align();
     private:
         std::string m_seq1;
-        unsigned int m_seq1_l;
+        int m_seq1_l;
         std::string m_seq2;
-        unsigned int m_seq2_l;
+        int m_seq2_l;
         int m_lambda;
         int m_delta;
 
