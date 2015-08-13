@@ -56,6 +56,7 @@ endif
 CPP_SRCS += \
     $(SRC_DIR)/main.cpp \
     $(SRC_DIR)/foldalign.cpp \
+    $(SRC_DIR)/Cost.cpp \
 
 INC_PATH += \
     -I$(INC_DIR) \
