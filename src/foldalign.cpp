@@ -46,6 +46,18 @@ int Foldalign::fold_align()
                 {
                     if (outOfBorder_l(l))
                         continue;
+                    //TODO: score function
+                    for (int m = j - 1; m < i + 1; ++m) //TODO: lambda
+                    {
+                        if (outOfBorder_j(j))
+                            continue;
+                        for (int n = l - 1; n < k + 1; ++n) //TODO: delta
+                        {
+                            if (outOfBorder_l(l))
+                                continue;
+                            //TODO: multibranch function
+                        }
+                    }
                     //std::cout << i << " " << k << " " << j << " " << l << "\n";
                 } //l
             } //j
