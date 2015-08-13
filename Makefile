@@ -1,4 +1,19 @@
 # foldalign Makefile
+# Choose -std=c++11 or -std=c++0x
+CXXVERSION = $(shell $(CXX) -dumpversion | cut -b 1-3)
+ifneq "$(filter g++,$(CXX))" ""
+ifeq "$(CXXVERSION)" "4.6"
+CPPSTD = -std=c++0x
+endif
+ifeq "$(CXXVERSION)" "4.4"
+$(error Bad $(CXX) version $(CXXVERSION). Atomic operations are required)
+endif
+endif
+
+ifeq "$(CPPSTD)" ""
+CPPSTD = -std=c++11
+endif
+
 BIN_DIR     = ./bin
 BIN         = $(BIN_DIR)/foldalign
 
@@ -7,7 +22,7 @@ TARGET      = $(BIN)
 SRC_DIR     = ./src
 INC_DIR     = ./src
 OBJ_DIR     = ./obj
-CPPFLAGS   += -W -Wall -pthread
+CPPFLAGS   += -W -Wall -pthread $(CPPSTD)
 LDFLAGS    += -pthread -lstdc++ -lm
 
 ifndef DEBUG

@@ -1,6 +1,10 @@
 #ifndef _FOLDALIGN_H
 #define _FOLDALIGN_H
 #include <string>
+#include <map>
+#include <tuple>
+
+typedef std::tuple<int, int, int, int> coord;
 
 class Foldalign {
     public:
@@ -13,5 +17,7 @@ class Foldalign {
         std::string m_seq2;
         int m_lambda;
         int m_delta;
+
+        std::map<coord, int> dp_matrix;
 };
 #endif

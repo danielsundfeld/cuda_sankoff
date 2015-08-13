@@ -34,6 +34,7 @@ int Foldalign::fold_align()
         << "\nseq2:\t" << m_seq2
         << "\n";
 
+    dp_matrix[coord(m_seq1.length() - 1, m_seq2.length() - 1, 0, 0)] = 0;
     for (int i = m_seq1.length() - 1; i >= 0; --i)
     {
         for (int k = m_seq2.length() - 1; k >= 0; --k)
