@@ -13,6 +13,16 @@ Foldalign::Foldalign(const std::string &s1, const std::string &s2,
     m_delta = delta;
 }
 
+int Foldalign::calculate_score(int i, int j, int k, int l)
+{
+    return -1;
+}
+
+int Foldalign::calculate_mb(int i, int j, int k, int l, int m, int n)
+{
+    return -1;
+}
+
 bool Foldalign::outOfBorder_lambda(const int j)
 {
     if (j >= m_seq1_l)
@@ -45,11 +55,14 @@ int Foldalign::fold_align()
             {
                 if (outOfBorder_lambda(j))
                     continue;
+
                 for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
                 {
+                    int score;
+
                     if (outOfBorder_delta(l))
                         continue;
-                    //TODO: score function
+                    score = calculate_score(i, j, k, l);
                     for (int m = j - 1; m < i + 1; ++m) //TODO: lambda
                     {
                         if (outOfBorder_lambda(j))
@@ -58,9 +71,10 @@ int Foldalign::fold_align()
                         {
                             if (outOfBorder_delta(l))
                                 continue;
-                            //TODO: multibranch function
-                        }
-                    }
+                            score = std::max(score, calculate_mb(i, j, k, l, m, n));
+                        } // n
+                    } // m
+                    dp_matrix[coord(i, j, k, l)] = score;
                     //std::cout << i << " " << k << " " << j << " " << l << "\n";
                 } //l
             } //j

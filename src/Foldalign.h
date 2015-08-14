@@ -13,6 +13,8 @@ class Foldalign {
         bool outOfBorder_delta(const int l);
         int fold_align();
     private:
+        int calculate_score(int i, int j, int k, int l);
+        int calculate_mb(int i, int j, int k, int l, int m, int n);
         std::string m_seq1;
         int m_seq1_l;
         std::string m_seq2;
