@@ -1,4 +1,4 @@
-#include "foldalign.h"
+#include "Foldalign.h"
 
 #include <iostream>
 

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "foldalign.h"
+#include "Foldalign.h"
 
 int main(int argc, char *argv[])
 {
