@@ -9,8 +9,8 @@ typedef std::tuple<int, int, int, int> coord;
 class Foldalign {
     public:
         Foldalign(const std::string &s1, const std::string &s2, const int lambda, const int delta);
-        bool outOfBorder_lambda(const int j);
-        bool outOfBorder_delta(const int l);
+        bool out_of_border_lambda(const int j);
+        bool out_of_border_delta(const int l);
         int fold_align();
     private:
         int calculate_score(int i, int j, int k, int l);

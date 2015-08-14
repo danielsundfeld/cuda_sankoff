@@ -23,14 +23,14 @@ int Foldalign::calculate_mb(int i, int j, int k, int l, int m, int n)
     return -1;
 }
 
-bool Foldalign::outOfBorder_lambda(const int j)
+bool Foldalign::out_of_border_lambda(const int j)
 {
     if (j >= m_seq1_l)
         return true;
     return false;
 }
 
-bool Foldalign::outOfBorder_delta(const int l)
+bool Foldalign::out_of_border_delta(const int l)
 {
     if (l < 0 || l >= m_seq2_l)
         return true;
@@ -53,23 +53,23 @@ int Foldalign::fold_align()
         {
             for (int j = 0; j < m_seq1_l; ++j) //TODO: lambda
             {
-                if (outOfBorder_lambda(j))
+                if (out_of_border_lambda(j))
                     continue;
 
                 for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
                 {
                     int score;
 
-                    if (outOfBorder_delta(l))
+                    if (out_of_border_delta(l))
                         continue;
                     score = calculate_score(i, j, k, l);
                     for (int m = j - 1; m < i + 1; ++m) //TODO: lambda
                     {
-                        if (outOfBorder_lambda(j))
+                        if (out_of_border_lambda(j))
                             continue;
                         for (int n = l - 1; n < k + 1; ++n) //TODO: delta
                         {
-                            if (outOfBorder_delta(l))
+                            if (out_of_border_delta(l))
                                 continue;
                             score = std::max(score, calculate_mb(i, j, k, l, m, n));
                         } // n
