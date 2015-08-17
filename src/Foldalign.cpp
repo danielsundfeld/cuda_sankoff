@@ -13,6 +13,11 @@ Foldalign::Foldalign(const std::string &s1, const std::string &s2,
     m_delta = delta;
 }
 
+void Foldalign::print_orig(int i, int j, int k, int l) const
+{
+    std::cout << i << " " << j << " " << k << " "  << l << ":";
+}
+
 void Foldalign::print_coord(int i, int j, int k, int l) const
 {
     std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
@@ -20,24 +25,33 @@ void Foldalign::print_coord(int i, int j, int k, int l) const
 
 int Foldalign::calculate_score(int i, int j, int k, int l)
 {
+    print_orig(i, j, k, l);
     print_coord(i + 1, j, k, l);
+    print_orig(i, j, k, l);
     print_coord(i, j, k + 1, l);
+    print_orig(i, j, k, l);
     print_coord(i, j - 1, k, l);
+    print_orig(i, j, k, l);
     print_coord(i, j, k, l - 1);
 
+    print_orig(i, j, k, l);
     print_coord(i + 1, j, k + 1, l);
+    print_orig(i, j, k, l);
     print_coord(i, j - 1, k, l - 1);
 
+    print_orig(i, j, k, l);
     print_coord(i + 1, j - 1, k, l);
+    print_orig(i, j, k, l);
     print_coord(i, j, k + 1, l - 1);
 
+    print_orig(i, j, k, l);
     print_coord(i + 1, j - 1 , k + 1, l - 1);
     return 0;
 }
 
 int Foldalign::calculate_mb(int i, int j, int k, int l, int m, int n)
 {
-    std::cout << "\t"
+    std::cout << i << " " << j << " " << k << " " << l << ":\t"
         << i << " " << m << " " << k << " " << n
         << " + "
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
@@ -90,10 +104,8 @@ int Foldalign::fold_align()
                 for (int k = l - 1; k >= 0; --k)
                 {
                     int score = 0;
-                    std::cout << i << " " << k << " " << j << " " << l << "\n";
 
                     score = calculate_score(i, j, k, l);
-                    std::cout << std::endl;
                     for (int m = j - 1; m >= i + 1; --m) //TODO: lambda
                     {
                         for (int n = l - 1; n >= k + 1; --n) //TODO: delta
@@ -103,6 +115,7 @@ int Foldalign::fold_align()
                     } //m
                     if (score > 0)
                         dp_matrix[coord(i, j, k, l)] = score;
+                    std::cout << std::endl;
                 } //k
             } //i
         } //l

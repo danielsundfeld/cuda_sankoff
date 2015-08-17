@@ -16,6 +16,7 @@ class Foldalign {
     private:
         int calculate_score(int i, int j, int k, int l);
         int calculate_mb(int i, int j, int k, int l, int m, int n);
+        void print_orig(int i, int j, int k, int l) const;
         void print_coord(int i, int j, int k, int l) const;
 
         std::string m_seq1;
