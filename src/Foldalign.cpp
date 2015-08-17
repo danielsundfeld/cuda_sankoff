@@ -13,14 +13,48 @@ Foldalign::Foldalign(const std::string &s1, const std::string &s2,
     m_delta = delta;
 }
 
+void Foldalign::print_coord(int i, int j, int k, int l) const
+{
+    std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
+}
+
 int Foldalign::calculate_score(int i, int j, int k, int l)
 {
-    return -1;
+    print_coord(i + 1, j, k, l);
+    print_coord(i, j, k + 1, l);
+    print_coord(i, j - 1, k, l);
+    print_coord(i, j, k, l - 1);
+
+    print_coord(i + 1, j, k + 1, l);
+    print_coord(i, j - 1, k, l - 1);
+
+    print_coord(i + 1, j - 1, k, l);
+    print_coord(i, j, k + 1, l - 1);
+
+    print_coord(i + 1, j - 1 , k + 1, l - 1);
+    return 0;
 }
 
 int Foldalign::calculate_mb(int i, int j, int k, int l, int m, int n)
 {
+    std::cout << "\t"
+        << i << " " << m << " " << k << " " << n
+        << " + "
+        << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
     return -1;
+}
+
+bool Foldalign::out_of_border(const int i, const int j, const int k, const int l) const
+{
+    if (i < 0 || i >= m_seq1_l)
+        return true;
+    if (j < 0 || j >= m_seq1_l)
+        return true;
+    if (k < 0 || k >= m_seq2_l)
+        return true;
+    if (l < 0 || l >= m_seq2_l)
+        return true;
+    return false;
 }
 
 bool Foldalign::out_of_border_lambda(const int j)
@@ -47,38 +81,31 @@ int Foldalign::fold_align()
         << "\n";
 
     dp_matrix[coord(m_seq1_l - 1, 0, m_seq2_l - 1, 0)] = 0;
-    for (int i = m_seq1_l - 1; i >= 0; --i)
+    for (int j = 0; j < m_seq1_l; ++j) //TODO: lambda
     {
-        for (int k = m_seq2_l - 1; k >= 0; --k)
+        for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
         {
-            for (int j = 0; j < m_seq1_l; ++j) //TODO: lambda
+            for (int i = j - 1; i >= 0; --i)
             {
-                if (out_of_border_lambda(j))
-                    continue;
-
-                for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
+                for (int k = l - 1; k >= 0; --k)
                 {
-                    int score;
+                    int score = 0;
+                    std::cout << i << " " << k << " " << j << " " << l << "\n";
 
-                    if (out_of_border_delta(l))
-                        continue;
                     score = calculate_score(i, j, k, l);
-                    for (int m = j - 1; m < i + 1; ++m) //TODO: lambda
+                    std::cout << std::endl;
+                    for (int m = j - 1; m >= i + 1; --m) //TODO: lambda
                     {
-                        if (out_of_border_lambda(j))
-                            continue;
-                        for (int n = l - 1; n < k + 1; ++n) //TODO: delta
+                        for (int n = l - 1; n >= k + 1; --n) //TODO: delta
                         {
-                            if (out_of_border_delta(l))
-                                continue;
                             score = std::max(score, calculate_mb(i, j, k, l, m, n));
-                        } // n
-                    } // m
-                    dp_matrix[coord(i, j, k, l)] = score;
-                    //std::cout << i << " " << k << " " << j << " " << l << "\n";
-                } //l
-            } //j
-        } //k
-    } // i
+                        } //n
+                    } //m
+                    if (score > 0)
+                        dp_matrix[coord(i, j, k, l)] = score;
+                } //k
+            } //i
+        } //l
+    } //j
     return 0;
 }
