@@ -96,13 +96,13 @@ int Foldalign::fold_align()
         << "\nseq2:\t" << m_seq2
         << "\n";
 
-    for (int j = 1; j < m_seq1_l; ++j) //TODO: lambda
+    for (int i = m_seq1_l - 1; i >= 0; --i)
     {
-        for (int l = 1; l < m_seq2_l; ++l) //TODO: delta
+        for (int k = m_seq2_l - 1; k >= 0; --k)
         {
-            for (int i = j - 1; i >= 0; --i)
+            for (int j = i + 1; j < m_seq1_l; ++j) //TODO: lambda
             {
-                for (int k = l - 1; k >= 0; --k)
+                for (int l = k + 1; l < m_seq2_l; ++l) //TODO: delta
                 {
                     int score = 0;
 
@@ -131,9 +131,9 @@ int Foldalign::fold_align()
                     if (score > 0)
                         dp_matrix[coord(i, j, k, l)] = score;
                     std::cout << std::endl;
-                } //k
-            } //i
-        } //l
-    } //j
+                } //l
+            } //j
+        } //k
+    } //i
     return 0;
 }
