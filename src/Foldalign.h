@@ -4,7 +4,7 @@
 #include <map>
 #include <tuple>
 
-typedef std::tuple<int, int, int, int> coord;
+typedef std::tuple<int, int, int, int> index;
 
 class Foldalign {
     public:
@@ -17,7 +17,7 @@ class Foldalign {
         void print_score_dep(int i, int j, int k, int l) const;
         void print_mb_dep(int i, int j, int k, int l, int m, int n) const;
         void print_orig(int i, int j, int k, int l) const;
-        void print_coord(int i, int j, int k, int l) const;
+        void print_index(int i, int j, int k, int l) const;
 
         std::string m_seq1;
         int m_seq1_l;
@@ -26,6 +26,6 @@ class Foldalign {
         int m_lambda;
         int m_delta;
 
-        std::map<coord, int> dp_matrix;
+        std::map<index, int> dp_matrix;
 };
 #endif
