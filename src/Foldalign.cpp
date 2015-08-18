@@ -71,14 +71,14 @@ bool Foldalign::out_of_border(const int i, const int j, const int k, const int l
     return false;
 }
 
-bool Foldalign::out_of_border_lambda(const int j)
+bool Foldalign::out_of_border_lambda(const int j) const
 {
     if (j >= m_seq1_l)
         return true;
     return false;
 }
 
-bool Foldalign::out_of_border_delta(const int l)
+bool Foldalign::out_of_border_delta(const int l) const
 {
     if (l < 0 || l >= m_seq2_l)
         return true;
