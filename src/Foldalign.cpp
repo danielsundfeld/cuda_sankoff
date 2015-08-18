@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Cost.h"
+
 Foldalign::Foldalign(const std::string &s1, const std::string &s2,
                      const int lambda, const int delta)
 {
@@ -94,10 +96,9 @@ int Foldalign::fold_align()
         << "\nseq2:\t" << m_seq2
         << "\n";
 
-    dp_matrix[coord(m_seq1_l - 1, 0, m_seq2_l - 1, 0)] = 0;
-    for (int j = 0; j < m_seq1_l; ++j) //TODO: lambda
+    for (int j = 1; j < m_seq1_l; ++j) //TODO: lambda
     {
-        for (int l = 0; l < m_seq2_l; ++l) //TODO: delta
+        for (int l = 1; l < m_seq2_l; ++l) //TODO: delta
         {
             for (int i = j - 1; i >= 0; --i)
             {
@@ -105,12 +106,26 @@ int Foldalign::fold_align()
                 {
                     int score = 0;
 
-                    score = calculate_score(i, j, k, l);
+                    calculate_score(i, j, k, l);
+
+                    score = std::max(score, dp_matrix[coord(i + 1, j, k, l)] + Cost::gap);
+                    score = std::max(score, dp_matrix[coord(i, j, k + 1, l)] + Cost::gap);
+                    score = std::max(score, dp_matrix[coord(i, j - 1, k, l)] + Cost::gap);
+                    score = std::max(score, dp_matrix[coord(i, j, k, l - 1)] + Cost::gap);
+                    score = std::max(score, dp_matrix[coord(i + 1, j, k + 1, l)] + Cost::match_score(m_seq1[i], m_seq2[k]));
+                    score = std::max(score, dp_matrix[coord(i, j - 1, k, l - 1)] + Cost::match_score(m_seq1[j], m_seq2[l]));
+                    score = std::max(score, dp_matrix[coord(i + 1, j - 1, k, l)] + Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[coord(i, j, k + 1, l - 1)] + Cost::base_score(m_seq2[k], m_seq2[l]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[coord(i + 1, j - 1, k + 1, l - 1)] +
+                                                        Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::base_score(m_seq2[k], m_seq2[l]) +
+                                                        Cost::compensation_score(m_seq1[i], m_seq1[j], m_seq2[k], m_seq2[l]));
+
                     for (int m = j - 1; m >= i + 1; --m) //TODO: lambda
                     {
                         for (int n = l - 1; n >= k + 1; --n) //TODO: delta
                         {
-                            score = std::max(score, calculate_mb(i, j, k, l, m, n));
+                            calculate_mb(i, j, k, l, m, n);
+                            score = std::max(score, dp_matrix[coord(i, m, k, n)] + dp_matrix[coord(m + 1, j, n + 1, l)]);
                         } //n
                     } //m
                     if (score > 0)
