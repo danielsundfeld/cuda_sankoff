@@ -25,7 +25,7 @@ void Foldalign::print_coord(int i, int j, int k, int l) const
     std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
 }
 
-int Foldalign::calculate_score(int i, int j, int k, int l)
+void Foldalign::print_score_dep(int i, int j, int k, int l) const
 {
     print_orig(i, j, k, l);
     print_coord(i + 1, j, k, l);
@@ -48,16 +48,14 @@ int Foldalign::calculate_score(int i, int j, int k, int l)
 
     print_orig(i, j, k, l);
     print_coord(i + 1, j - 1 , k + 1, l - 1);
-    return 0;
 }
 
-int Foldalign::calculate_mb(int i, int j, int k, int l, int m, int n)
+void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 {
     std::cout << i << " " << j << " " << k << " " << l << ":\t"
         << i << " " << m << " " << k << " " << n
         << " + "
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
-    return -1;
 }
 
 bool Foldalign::out_of_border(const int i, const int j, const int k, const int l) const
@@ -106,7 +104,7 @@ int Foldalign::fold_align()
                 {
                     int score = 0;
 
-                    calculate_score(i, j, k, l);
+                    print_score_dep(i, j, k, l);
 
                     score = std::max(score, dp_matrix[coord(i + 1, j, k, l)] + Cost::gap);
                     score = std::max(score, dp_matrix[coord(i, j, k + 1, l)] + Cost::gap);
@@ -124,7 +122,7 @@ int Foldalign::fold_align()
                     {
                         for (int n = l - 1; n >= k + 1; --n) //TODO: delta
                         {
-                            calculate_mb(i, j, k, l, m, n);
+                            print_mb_dep(i, j, k, l, m, n);
                             score = std::max(score, dp_matrix[coord(i, m, k, n)] + dp_matrix[coord(m + 1, j, n + 1, l)]);
                         } //n
                     } //m
@@ -135,5 +133,6 @@ int Foldalign::fold_align()
             } //j
         } //k
     } //i
+    std::cout << dp_matrix[coord(0, m_seq1_l - 1, 0, m_seq2_l - 1)] << std::endl;
     return 0;
 }

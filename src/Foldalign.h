@@ -14,8 +14,8 @@ class Foldalign {
         bool out_of_border(const int i, const int j, const int k, const int l) const;
         int fold_align();
     private:
-        int calculate_score(int i, int j, int k, int l);
-        int calculate_mb(int i, int j, int k, int l, int m, int n);
+        void print_score_dep(int i, int j, int k, int l) const;
+        void print_mb_dep(int i, int j, int k, int l, int m, int n) const;
         void print_orig(int i, int j, int k, int l) const;
         void print_coord(int i, int j, int k, int l) const;
 
