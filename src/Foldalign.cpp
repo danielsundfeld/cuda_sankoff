@@ -118,9 +118,9 @@ int Foldalign::sankoff()
                                                         Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::base_score(m_seq2[k], m_seq2[l]) +
                                                         Cost::compensation_score(m_seq1[i], m_seq1[j], m_seq2[k], m_seq2[l]));
 
-                    for (int m = j - 1; m >= i + 1; --m)
+                    for (int m = i + 1; m < j; ++m)
                     {
-                        for (int n = l - 1; n >= k + 1; --n)
+                        for (int n = k + 1; n < l; ++n)
                         {
                             print_mb_dep(i, j, k, l, m, n);
                             score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
@@ -169,9 +169,9 @@ int Foldalign::fold_align()
                                                         Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::base_score(m_seq2[k], m_seq2[l]) +
                                                         Cost::compensation_score(m_seq1[i], m_seq1[j], m_seq2[k], m_seq2[l]));
 
-                    for (int m = j - 1; m >= i + 1; --m) //TODO: lambda
+                    for (int m = i + 1; m < j; ++m) //TODO: lambda
                     {
-                        for (int n = l - 1; n >= k + 1; --n) //TODO: delta
+                        for (int n = k + 1; n < l; ++n) //TODO: delta
                         {
                             print_mb_dep(i, j, k, l, m, n);
                             score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
