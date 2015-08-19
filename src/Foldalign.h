@@ -12,7 +12,8 @@ class Foldalign {
         bool out_of_border_lambda(const int j) const;
         bool out_of_border_delta(const int l) const;
         bool out_of_border(const int i, const int j, const int k, const int l) const;
-        int fold_align();
+        int sankoff(); //Run a pure sankoff algorithm
+        int fold_align(); //Run with the Foldalign heuristic
     private:
         void print_score_dep(int i, int j, int k, int l) const;
         void print_mb_dep(int i, int j, int k, int l, int m, int n) const;
