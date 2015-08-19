@@ -25,6 +25,7 @@ void Foldalign::print_index(int i, int j, int k, int l) const
     std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
 }
 
+// To visualize the data dependecy...
 void Foldalign::print_score_dep(int i, int j, int k, int l) const
 {
     print_orig(i, j, k, l);
@@ -50,6 +51,7 @@ void Foldalign::print_score_dep(int i, int j, int k, int l) const
     print_index(i + 1, j - 1 , k + 1, l - 1);
 }
 
+// To visualize the data dependecy...
 void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 {
     std::cout << i << " " << j << " " << k << " " << l << ":\t"
@@ -128,7 +130,6 @@ int Foldalign::fold_align()
                     } //m
                     if (score > 0)
                         dp_matrix[index(i, j, k, l)] = score;
-                    std::cout << std::endl;
                 } //l
             } //j
         } //k
