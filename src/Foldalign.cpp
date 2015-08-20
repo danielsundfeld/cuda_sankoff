@@ -60,33 +60,6 @@ void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
 }
 
-bool Foldalign::out_of_border(const int i, const int j, const int k, const int l) const
-{
-    if (i < 0 || i >= s1_l)
-        return true;
-    if (j < 0 || j >= s1_l)
-        return true;
-    if (k < 0 || k >= s2_l)
-        return true;
-    if (l < 0 || l >= s2_l)
-        return true;
-    return false;
-}
-
-bool Foldalign::out_of_border_lambda(const int j) const
-{
-    if (j >= s1_l)
-        return true;
-    return false;
-}
-
-bool Foldalign::out_of_border_delta(const int l) const
-{
-    if (l < 0 || l >= s2_l)
-        return true;
-    return false;
-}
-
 int Foldalign::sankoff()
 {
     std::cout << "Sankoff:"
