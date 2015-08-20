@@ -4,15 +4,15 @@
 
 #include "Cost.h"
 
-Foldalign::Foldalign(const std::string &s1, const std::string &s2,
-                     const int lambda, const int delta)
+Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
+                     const int lmbd, const int dlt)
 {
-    m_seq1 = s1;
-    m_seq1_l = (int) m_seq1.length(); //TODO: throw exception if negative
-    m_seq2 = s2;
-    m_seq2_l = (int) m_seq2.length();
-    m_lambda = lambda;
-    m_delta = delta;
+    s1 = seq1;
+    s1_l = (int) s1.length(); //TODO: throw exception if negative
+    s2 = seq2;
+    s2_l = (int) s2.length();
+    lambda = lmbd;
+    delta = dlt;
 }
 
 void Foldalign::print_orig(int i, int j, int k, int l) const
@@ -62,27 +62,27 @@ void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 
 bool Foldalign::out_of_border(const int i, const int j, const int k, const int l) const
 {
-    if (i < 0 || i >= m_seq1_l)
+    if (i < 0 || i >= s1_l)
         return true;
-    if (j < 0 || j >= m_seq1_l)
+    if (j < 0 || j >= s1_l)
         return true;
-    if (k < 0 || k >= m_seq2_l)
+    if (k < 0 || k >= s2_l)
         return true;
-    if (l < 0 || l >= m_seq2_l)
+    if (l < 0 || l >= s2_l)
         return true;
     return false;
 }
 
 bool Foldalign::out_of_border_lambda(const int j) const
 {
-    if (j >= m_seq1_l)
+    if (j >= s1_l)
         return true;
     return false;
 }
 
 bool Foldalign::out_of_border_delta(const int l) const
 {
-    if (l < 0 || l >= m_seq2_l)
+    if (l < 0 || l >= s2_l)
         return true;
     return false;
 }
@@ -90,17 +90,17 @@ bool Foldalign::out_of_border_delta(const int l) const
 int Foldalign::sankoff()
 {
     std::cout << "Sankoff:"
-        << "\nseq1:\t" << m_seq1
-        << "\nseq2:\t" << m_seq2
+        << "\nseq1:\t" << s1
+        << "\nseq2:\t" << s2
         << "\n";
 
-    for (int i = m_seq1_l - 1; i >= 0; --i)
+    for (int i = s1_l - 1; i >= 0; --i)
     {
-        for (int k = m_seq2_l - 1; k >= 0; --k)
+        for (int k = s2_l - 1; k >= 0; --k)
         {
-            for (int j = i + 1; j < m_seq1_l; ++j)
+            for (int j = i + 1; j < s1_l; ++j)
             {
-                for (int l = k + 1; l < m_seq2_l; ++l)
+                for (int l = k + 1; l < s2_l; ++l)
                 {
                     int score = 0;
 
@@ -110,13 +110,13 @@ int Foldalign::sankoff()
                     score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
                     score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
                     score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(m_seq1[i], m_seq2[k]));
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(m_seq1[j], m_seq2[l]));
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(m_seq2[k], m_seq2[l]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
+                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
+                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
                     score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
-                                                        Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::base_score(m_seq2[k], m_seq2[l]) +
-                                                        Cost::compensation_score(m_seq1[i], m_seq1[j], m_seq2[k], m_seq2[l]));
+                                                        Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
+                                                        Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
                     for (int m = i + 1; m < j; ++m)
                     {
@@ -132,35 +132,35 @@ int Foldalign::sankoff()
             } //j
         } //k
     } //i
-    std::cout << dp_matrix[index(0, m_seq1_l - 1, 0, m_seq2_l - 1)] << std::endl;
+    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
     return 0;
 }
 
 int Foldalign::fold_align()
 {
     std::cout << "Foldalign:"
-        << "\n\u03B4 = " << m_delta
-        << "\n\u03BB = " << m_lambda
-        << "\nseq1:\t" << m_seq1
-        << "\nseq2:\t" << m_seq2
+        << "\n\u03B4 = " << delta
+        << "\n\u03BB = " << lambda
+        << "\nseq1:\t" << s1
+        << "\nseq2:\t" << s2
         << "\n";
 
-    for (int i = m_seq1_l - 1; i >= 0; --i)
+    for (int i = s1_l - 1; i >= 0; --i)
     {
-        for (int k = m_seq2_l - 1; k >= 0; --k)
+        for (int k = s2_l - 1; k >= 0; --k)
         {
-            int j_end = i + 1 + m_lambda;
-            if (j_end > m_seq1_l)
-                j_end = m_seq1_l;
+            int j_end = i + 1 + lambda;
+            if (j_end > s1_l)
+                j_end = s1_l;
 
             for (int j = i + 1; j < j_end; ++j)
             {
-                int l_begin = j - m_delta;
+                int l_begin = j - delta;
                 if (l_begin < k + 1)
                     l_begin = k + 1;
-                int l_end = j + m_delta;
-                if (l_end > m_seq2_l)
-                    l_end = m_seq2_l;
+                int l_end = j + delta;
+                if (l_end > s2_l)
+                    l_end = s2_l;
 
                 for (int l = l_begin; l < l_end; ++l)
                 {
@@ -172,23 +172,23 @@ int Foldalign::fold_align()
                     score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
                     score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
                     score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(m_seq1[i], m_seq2[k]));
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(m_seq1[j], m_seq2[l]));
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(m_seq2[k], m_seq2[l]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
+                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
+                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
                     score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
-                                                        Cost::base_score(m_seq1[i], m_seq1[j]) + Cost::base_score(m_seq2[k], m_seq2[l]) +
-                                                        Cost::compensation_score(m_seq1[i], m_seq1[j], m_seq2[k], m_seq2[l]));
+                                                        Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
+                                                        Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
-                    int m_end = i + 1 + m_lambda;
+                    int m_end = i + 1 + lambda;
                     if (m_end > j)
                         m_end = j;
                     for (int m = i + 1; m < m_end; ++m)
                     {
-                        int n_begin = m - m_delta;
+                        int n_begin = m - delta;
                         if (n_begin < k + 1)
                             n_begin = k + 1;
-                        int n_end = m + m_delta;
+                        int n_end = m + delta;
                         if (n_end > l)
                             n_end = l;
 
@@ -204,6 +204,6 @@ int Foldalign::fold_align()
             } //j
         } //k
     } //i
-    std::cout << dp_matrix[index(0, m_seq1_l - 1, 0, m_seq2_l - 1)] << std::endl;
+    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
     return 0;
 }
