@@ -28,6 +28,7 @@ void Foldalign::print_index(int i, int j, int k, int l) const
 // To visualize the data dependecy...
 void Foldalign::print_score_dep(int i, int j, int k, int l) const
 {
+    return;
     print_orig(i, j, k, l);
     print_index(i + 1, j, k, l);
     print_orig(i, j, k, l);
@@ -54,10 +55,52 @@ void Foldalign::print_score_dep(int i, int j, int k, int l) const
 // To visualize the data dependecy...
 void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 {
+    return;
     std::cout << i << " " << j << " " << k << " " << l << ":\t"
         << i << " " << m << " " << k << " " << n
         << " + "
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
+}
+
+void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &l)
+{
+    int score = 0;
+
+    print_score_dep(i, j, k, l);
+
+    score = std::max(score, dp_matrix[index(i + 1, j, k, l)] + Cost::gap);
+    score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
+    score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
+    score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
+    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
+    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
+    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
+            Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
+            Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
+
+    for (int m = i + 1; m < j; ++m)
+    {
+        for (int n = k + 1; n < l; ++n)
+        {
+            print_mb_dep(i, j, k, l, m, n);
+            score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
+        } //n
+    } //m
+    if (score > 0)
+        dp_matrix[index(i, j, k, l)] = score;
+}
+
+void Foldalign::expand_inner_matrix(const int &i, const int &k)
+{
+    for (int j = i + 1; j < s1_l; ++j)
+    {
+        for (int l = k + 1; l < s2_l; ++l)
+        {
+            expand_pos(i, j, k, l);
+        } //l
+    } //j
 }
 
 int Foldalign::sankoff()
@@ -71,40 +114,44 @@ int Foldalign::sankoff()
     {
         for (int k = s2_l - 1; k >= 0; --k)
         {
-            for (int j = i + 1; j < s1_l; ++j)
-            {
-                for (int l = k + 1; l < s2_l; ++l)
-                {
-                    int score = 0;
-
-                    print_score_dep(i, j, k, l);
-
-                    score = std::max(score, dp_matrix[index(i + 1, j, k, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
-                                                        Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
-                                                        Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
-
-                    for (int m = i + 1; m < j; ++m)
-                    {
-                        for (int n = k + 1; n < l; ++n)
-                        {
-                            print_mb_dep(i, j, k, l, m, n);
-                            score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
-                        } //n
-                    } //m
-                    if (score > 0)
-                        dp_matrix[index(i, j, k, l)] = score;
-                } //l
-            } //j
+            std::cout << i << "/" << k << std::endl;
+            expand_inner_matrix(i, k);
         } //k
     } //i
+    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
+    return 0;
+}
+
+int Foldalign::diag_sankoff()
+{
+    std::cout << "Sankoff:"
+        << "\nseq1:\t" << s1
+        << "\nseq2:\t" << s2
+        << "\n";
+
+    for (int outer_diag = s2_l - 1; outer_diag >= 0; --outer_diag)
+    {
+        for (int i = s1_l - 1; i >= outer_diag; --i)
+        {
+            int k = outer_diag - (i - s2_l) - 1;
+            std::cout << i << "/" << k << std::endl;
+
+            expand_inner_matrix(i, k);
+        } //i
+        std::cout << std::endl;
+    } //outer_diag
+
+    for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
+    {
+        for (int i = 0; i <= outer_diag; ++i)
+        {
+            int k = outer_diag - i;
+            std::cout << i << "/" << k << std::endl;
+
+            expand_inner_matrix(i, k);
+        }
+        std::cout << std::endl;
+    } //outer_diag
     std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
     return 0;
 }

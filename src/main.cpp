@@ -8,5 +8,5 @@ int main(int argc, char *argv[])
     (void) argv;
     Foldalign fold_instance("CCCCCCCCAAAAGGGGGGGG", "GUGCCAACAUUAGUUGGCAC", 20, 20);
 
-    return fold_instance.fold_align();
+    return fold_instance.diag_sankoff();
 }
