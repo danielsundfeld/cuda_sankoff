@@ -128,22 +128,19 @@ int Foldalign::diag_sankoff()
         << "\nseq2:\t" << s2
         << "\n";
 
-    for (int outer_diag = s2_l - 1; outer_diag >= 0; --outer_diag)
+    for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
     {
-        for (int i = s1_l - 1; i >= outer_diag; --i)
+        int i = s1_l - 1;
+        for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k, --i)
         {
-            int k = outer_diag - (i - s2_l) - 1;
-
             expand_inner_matrix(i, k);
         } //i
     } //outer_diag
-
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
-        for (int i = 0; i <= outer_diag; ++i)
+        int i = outer_diag;
+        for (int k = 0; k <= s2_l - 1 && i >= 0; ++k, --i)
         {
-            int k = outer_diag - i;
-
             expand_inner_matrix(i, k);
         }
     } //outer_diag
