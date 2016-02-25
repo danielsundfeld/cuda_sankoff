@@ -94,9 +94,9 @@ void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &
 
 void Foldalign::expand_inner_matrix(const int &i, const int &k)
 {
-    for (int j = i + 1; j < s1_l; ++j)
+    for (int j = i; j < s1_l; ++j)
     {
-        for (int l = k + 1; l < s2_l; ++l)
+        for (int l = k; l < s2_l; ++l)
         {
             expand_pos(i, j, k, l);
         } //l
