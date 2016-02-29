@@ -15,6 +15,7 @@ class Foldalign {
 
     private:
         void expand_inner_matrix(const int &i, const int &k);
+        void expand_inner_matrix_diag(const int &i, const int &k);
         void expand_pos(const int &i, const int &j, const int &k, const int &l);
         void print_score_dep(int i, int j, int k, int l) const;
         void print_mb_dep(int i, int j, int k, int l, int m, int n) const;

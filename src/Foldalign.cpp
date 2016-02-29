@@ -103,6 +103,26 @@ void Foldalign::expand_inner_matrix(const int &i, const int &k)
     } //j
 }
 
+void Foldalign::expand_inner_matrix_diag(const int &i, const int &k)
+{
+    for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
+    {
+        int j = inner_diag;
+        for (int l = k; l < s2_l && j >= i && j < s1_l; ++l, --j)
+        {
+            expand_pos(i, j, k, l);
+        }
+    }
+    for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
+    {
+        int j = s1_l - 1;
+        for (int l = inner_diag; l < s1_l && j >= i; --j, ++l)
+        {
+            expand_pos(i, j, k, l);
+        }
+    }
+}
+
 int Foldalign::sankoff()
 {
     std::cout << "Sankoff:"
@@ -133,7 +153,7 @@ int Foldalign::diag_sankoff()
         int i = s1_l - 1;
         for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k, --i)
         {
-            expand_inner_matrix(i, k);
+            expand_inner_matrix_diag(i, k);
         } //i
     } //outer_diag
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
@@ -141,7 +161,7 @@ int Foldalign::diag_sankoff()
         int i = outer_diag;
         for (int k = 0; k <= s2_l - 1 && i >= 0; ++k, --i)
         {
-            expand_inner_matrix(i, k);
+            expand_inner_matrix_diag(i, k);
         }
     } //outer_diag
     std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
