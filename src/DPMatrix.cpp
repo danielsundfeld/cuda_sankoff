@@ -1,10 +1,17 @@
 #include "DPMatrix.h"
 
+#include <iostream>
+
 DPMatrix::DPMatrix(const int &s1_l, const int &s2_l)
 : s1_l(s1_l),
   s2_l(s2_l)
 {
+    dp_matrix = new int[(((1 + s1_l) * s1_l) / 2 ) * (((1 + s2_l) * s2_l) / 2)]();
+}
 
+DPMatrix::~DPMatrix()
+{
+    delete[] dp_matrix;
 }
 
 int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
@@ -12,12 +19,12 @@ int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
     if (check_border(i, j, k, l) == false)
         return -1024;
 
-    return matrix[index(i, j, k, l)];
+    return dp_matrix[calc_delta(i, j, k, l)];
 }
 
 void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const int &val)
 {
-    matrix[index(i, j, k, l)] = val;
+    dp_matrix[calc_delta(i, j, k, l)] = val;
 }
 
 int DPMatrix::calc_delta(int i, int j, int k, int l) const
