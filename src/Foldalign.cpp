@@ -15,6 +15,20 @@ Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
     delta = dlt;
 }
 
+int Foldalign::calc_delta(int i, int j, int k, int l) const
+{
+    i = s1_l - i;
+    j = s1_l - j;
+    k = s2_l - k;
+    l = s2_l - l;
+
+    int delta_i = ((1 + s1_l) * s1_l / 2) * (i * (i - 1) / 2);
+    int delta_k = i * (k * (k - 1) / 2);
+    int delta_mi = (j - 1) * k + l - 1;
+    //std::cout << delta_i + delta_k + delta_mi << " (" << delta_i << " " << delta_k << " " << delta_mi << ") " << i << " " << j << " " << k << " " << l << "\n";
+    return delta_i + delta_k + delta_mi;
+}
+
 void Foldalign::print_orig(int i, int j, int k, int l) const
 {
     std::cout << i << " " << j << " " << k << " "  << l << ":";
@@ -29,6 +43,7 @@ void Foldalign::print_index(int i, int j, int k, int l) const
 void Foldalign::print_score_dep(int i, int j, int k, int l) const
 {
     return;
+    calc_delta(i, j, k, l);
     print_orig(i, j, k, l);
     print_index(i + 1, j, k, l);
     print_orig(i, j, k, l);

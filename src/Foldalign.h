@@ -14,6 +14,7 @@ class Foldalign {
         int fold_align(); //Run with the Foldalign heuristic
 
     private:
+        int calc_delta(int i, int j, int k, int l) const;
         void expand_inner_matrix(const int &i, const int &k);
         void expand_inner_matrix_diag(const int &i, const int &k);
         void expand_pos(const int &i, const int &j, const int &k, const int &l);
