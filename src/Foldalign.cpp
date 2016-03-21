@@ -108,7 +108,7 @@ void Foldalign::expand_inner_matrix_diag(const int &i, const int &k)
 {
     for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
     {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic,1)
         for (int l = k; l < s2_l; ++l)
         {
             int j = inner_diag - (l - k);
@@ -118,7 +118,7 @@ void Foldalign::expand_inner_matrix_diag(const int &i, const int &k)
     }
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
     {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic,1)
         for (int l = inner_diag; l < s1_l; ++l)
         {
             int j = s1_l - 1 - (l - inner_diag);
@@ -155,7 +155,7 @@ int Foldalign::diag_sankoff()
 
     for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
     {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic,1)
         for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k)
         {
             int i = s2_l - 1 - outer_diag + s1_l - 1 - k;
@@ -164,7 +164,7 @@ int Foldalign::diag_sankoff()
     } //outer_diag
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic,1)
         for (int k = 0; k <= s2_l - 1; ++k)
         {
             int i = outer_diag - k;
