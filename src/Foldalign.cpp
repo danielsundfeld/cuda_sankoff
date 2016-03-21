@@ -6,6 +6,7 @@
 
 Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
                      const int lmbd, const int dlt)
+: dp_matrix(s1_l, s2_l)
 {
     s1 = seq1;
     s1_l = (int) s1.length(); //TODO: throw exception if negative
@@ -83,15 +84,15 @@ void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &
 
     print_score_dep(i, j, k, l);
 
-    score = std::max(score, dp_matrix[index(i + 1, j, k, l)] + Cost::gap);
-    score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
-    score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
-    score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
-    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
-    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
-    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
+    score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
+    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
+    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
+    score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
+    score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
+    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
+    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
             Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
@@ -100,11 +101,11 @@ void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &
         for (int n = k + 1; n < l; ++n)
         {
             print_mb_dep(i, j, k, l, m, n);
-            score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
+            score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
         } //n
     } //m
     if (score > 0)
-        dp_matrix[index(i, j, k, l)] = score;
+        dp_matrix.put_pos(i, j, k, l, score);
 }
 
 void Foldalign::expand_inner_matrix(const int &i, const int &k)
@@ -152,7 +153,7 @@ int Foldalign::sankoff()
             expand_inner_matrix(i, k);
         } //k
     } //i
-    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
+    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
     return 0;
 }
 
@@ -179,7 +180,7 @@ int Foldalign::diag_sankoff()
             expand_inner_matrix_diag(i, k);
         }
     } //outer_diag
-    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
+    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
     return 0;
 }
 
@@ -215,15 +216,15 @@ int Foldalign::fold_align()
 
                     print_score_dep(i, j, k, l);
 
-                    score = std::max(score, dp_matrix[index(i + 1, j, k, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i, j, k, l - 1)] + Cost::gap);
-                    score = std::max(score, dp_matrix[index(i + 1, j, k + 1, l)] + Cost::match_score(s1[i], s2[k]));
-                    score = std::max(score, dp_matrix[index(i, j - 1, k, l - 1)] + Cost::match_score(s1[j], s2[l]));
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k, l)] + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i, j, k + 1, l - 1)] + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix[index(i + 1, j - 1, k + 1, l - 1)] +
+                    score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
+                    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
+                    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
+                    score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
+                    score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
+                    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
+                    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+                    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
                                                         Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
                                                         Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
@@ -242,15 +243,15 @@ int Foldalign::fold_align()
                         for (int n = n_begin; n < n_end; ++n)
                         {
                             print_mb_dep(i, j, k, l, m, n);
-                            score = std::max(score, dp_matrix[index(i, m, k, n)] + dp_matrix[index(m + 1, j, n + 1, l)]);
+                            score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
                         } //n
                     } //m
                     if (score > 0)
-                        dp_matrix[index(i, j, k, l)] = score;
+                        dp_matrix.put_pos(i, j, k, l, score);
                 } //l
             } //j
         } //k
     } //i
-    std::cout << dp_matrix[index(0, s1_l - 1, 0, s2_l - 1)] << std::endl;
+    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
     return 0;
 }

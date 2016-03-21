@@ -55,6 +55,7 @@ endif
 
 CPP_SRCS += \
     $(SRC_DIR)/main.cpp \
+    $(SRC_DIR)/DPMatrix.cpp \
     $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Cost.cpp \
 

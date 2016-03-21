@@ -4,7 +4,7 @@
 #include <map>
 #include <tuple>
 
-typedef std::tuple<int, int, int, int> index;
+#include "DPMatrix.h"
 
 class Foldalign {
     public:
@@ -30,6 +30,6 @@ class Foldalign {
         int lambda;
         int delta;
 
-        std::map<index, int> dp_matrix;
+        DPMatrix dp_matrix;
 };
 #endif
