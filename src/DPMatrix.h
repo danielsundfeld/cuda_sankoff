@@ -14,8 +14,9 @@ class DPMatrix {
 
     private:
         int calc_delta(int i, int j, int k, int l) const;
-        std::map<index, int> matrix;
+        bool check_border(const int &i, const int &j, const int &k, const int &l) const;
 
+        std::map<index, int> matrix;
         const int s1_l;
         const int s2_l;
 };

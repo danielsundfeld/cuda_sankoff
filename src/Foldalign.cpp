@@ -6,7 +6,7 @@
 
 Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
                      const int lmbd, const int dlt)
-: dp_matrix(s1_l, s2_l)
+: dp_matrix(seq1.length(), seq2.length())
 {
     s1 = seq1;
     s1_l = (int) s1.length(); //TODO: throw exception if negative

@@ -9,6 +9,9 @@ DPMatrix::DPMatrix(const int &s1_l, const int &s2_l)
 
 int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
 {
+    if (check_border(i, j, k, l) == false)
+        return -1024;
+
     return matrix[index(i, j, k, l)];
 }
 
@@ -29,4 +32,17 @@ int DPMatrix::calc_delta(int i, int j, int k, int l) const
     int delta_mi = (j - 1) * k + l - 1;
     //std::cout << delta_i + delta_k + delta_mi << " (" << delta_i << " " << delta_k << " " << delta_mi << ") " << i << " " << j << " " << k << " " << l << "\n";
     return delta_i + delta_k + delta_mi;
+}
+
+bool DPMatrix::check_border(const int &i, const int &j, const int &k, const int &l) const
+{
+    if (j < i)
+        return false;
+    if (l < k)
+        return false;
+    if (i < 0 || j < 0 || k < 0 || l < 0)
+        return false;
+    if (i > s1_l || j > s1_l || k > s2_l || l > s2_l)
+        return false;
+    return true;
 }
