@@ -16,6 +16,10 @@ Sankoff::Sankoff(const std::string &seq1, const std::string &seq2,
     delta = dlt;
 }
 
+Sankoff::~Sankoff()
+{
+}
+
 void Sankoff::print_orig(int i, int j, int k, int l) const
 {
     std::cout << i << " " << j << " " << k << " "  << l << ":";

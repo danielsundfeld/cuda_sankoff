@@ -7,6 +7,7 @@
 class Sankoff {
     public:
         Sankoff(const std::string &seq1, const std::string &seq2, const int lmbd, const int dlt);
+        virtual ~Sankoff();
         int sankoff(); //Run a pure sankoff algorithm
         int diag_sankoff(); //Run a pure sankoff algorithm
         int fold_align(); //Run with the Foldalign heuristic
