@@ -1,4 +1,3 @@
-# foldalign Makefile
 # Choose -std=c++11 or -std=c++0x
 CXXVERSION = $(shell $(CXX) -dumpversion | cut -b 1-3)
 ifneq "$(filter g++,$(CXX))" ""
@@ -15,7 +14,7 @@ CPPSTD = -std=c++11
 endif
 
 BIN_DIR     = ./bin
-BIN         = $(BIN_DIR)/foldalign
+BIN         = $(BIN_DIR)/sankoff
 
 TARGET      = $(BIN)
 
@@ -55,9 +54,9 @@ endif
 
 CPP_SRCS += \
     $(SRC_DIR)/main.cpp \
-    $(SRC_DIR)/DPMatrix.cpp \
-    $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Cost.cpp \
+    $(SRC_DIR)/DPMatrix.cpp \
+    $(SRC_DIR)/Sankoff.cpp \
 
 INC_PATH += \
     -I$(INC_DIR) \

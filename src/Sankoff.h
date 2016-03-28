@@ -1,14 +1,12 @@
-#ifndef _FOLDALIGN_H
-#define _FOLDALIGN_H
+#ifndef _SANKOFF_H
+#define _SANKOFF_H
 #include <string>
-#include <map>
-#include <tuple>
 
 #include "DPMatrix.h"
 
-class Foldalign {
+class Sankoff {
     public:
-        Foldalign(const std::string &seq1, const std::string &seq2, const int lmbd, const int dlt);
+        Sankoff(const std::string &seq1, const std::string &seq2, const int lmbd, const int dlt);
         int sankoff(); //Run a pure sankoff algorithm
         int diag_sankoff(); //Run a pure sankoff algorithm
         int fold_align(); //Run with the Foldalign heuristic

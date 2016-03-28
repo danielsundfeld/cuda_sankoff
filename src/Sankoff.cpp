@@ -1,10 +1,10 @@
-#include "Foldalign.h"
+#include "Sankoff.h"
 
 #include <iostream>
 
 #include "Cost.h"
 
-Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
+Sankoff::Sankoff(const std::string &seq1, const std::string &seq2,
                      const int lmbd, const int dlt)
 : dp_matrix(seq1.length(), seq2.length())
 {
@@ -16,18 +16,18 @@ Foldalign::Foldalign(const std::string &seq1, const std::string &seq2,
     delta = dlt;
 }
 
-void Foldalign::print_orig(int i, int j, int k, int l) const
+void Sankoff::print_orig(int i, int j, int k, int l) const
 {
     std::cout << i << " " << j << " " << k << " "  << l << ":";
 }
 
-void Foldalign::print_index(int i, int j, int k, int l) const
+void Sankoff::print_index(int i, int j, int k, int l) const
 {
     std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
 }
 
 // To visualize the data dependecy...
-void Foldalign::print_score_dep(int i, int j, int k, int l) const
+void Sankoff::print_score_dep(int i, int j, int k, int l) const
 {
     return;
     print_orig(i, j, k, l);
@@ -54,7 +54,7 @@ void Foldalign::print_score_dep(int i, int j, int k, int l) const
 }
 
 // To visualize the data dependecy...
-void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
+void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 {
     return;
     std::cout << i << " " << j << " " << k << " " << l << ":\t"
@@ -63,7 +63,7 @@ void Foldalign::print_mb_dep(int i, int j, int k, int l, int m, int n) const
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
 }
 
-void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &l)
+void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 {
     int score = 0;
 
@@ -93,7 +93,7 @@ void Foldalign::expand_pos(const int &i, const int &j, const int &k, const int &
         dp_matrix.put_pos(i, j, k, l, score);
 }
 
-void Foldalign::expand_inner_matrix(const int &i, const int &k)
+void Sankoff::expand_inner_matrix(const int &i, const int &k)
 {
     for (int j = i; j < s1_l; ++j)
     {
@@ -104,7 +104,7 @@ void Foldalign::expand_inner_matrix(const int &i, const int &k)
     } //j
 }
 
-void Foldalign::expand_inner_matrix_diag(const int &i, const int &k)
+void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
 {
     for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
     {
@@ -128,7 +128,7 @@ void Foldalign::expand_inner_matrix_diag(const int &i, const int &k)
     }
 }
 
-int Foldalign::sankoff()
+int Sankoff::sankoff()
 {
     std::cout << "Sankoff:"
         << "\nseq1:\t" << s1
@@ -146,7 +146,7 @@ int Foldalign::sankoff()
     return 0;
 }
 
-int Foldalign::diag_sankoff()
+int Sankoff::diag_sankoff()
 {
     std::cout << "Sankoff:"
         << "\nseq1:\t" << s1
@@ -176,7 +176,7 @@ int Foldalign::diag_sankoff()
     return 0;
 }
 
-int Foldalign::fold_align()
+int Sankoff::fold_align()
 {
     std::cout << "Foldalign:"
         << "\n\u03B4 = " << delta
