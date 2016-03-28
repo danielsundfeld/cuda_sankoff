@@ -21,8 +21,8 @@ TARGET      = $(BIN)
 SRC_DIR     = ./src
 INC_DIR     = ./src
 OBJ_DIR     = ./obj
-CPPFLAGS   += -W -Wall -pthread $(CPPSTD) -fopenmp
-LDFLAGS    += -pthread -lstdc++ -lm -fopenmp
+CPPFLAGS   += -W -Wall -fopenmp $(CPPSTD)
+LDFLAGS    += -fopenmp -lstdc++ -lm
 
 ifndef DEBUG
     OPTIMIZE = yes
