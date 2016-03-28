@@ -1,2 +1,5 @@
 *.o
+*.swp
 *tags
+bin/foldalign
+bin/sankoff
