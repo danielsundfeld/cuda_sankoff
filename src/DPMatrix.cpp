@@ -6,7 +6,7 @@ DPMatrix::DPMatrix(const int &s1_l, const int &s2_l)
 : s1_l(s1_l),
   s2_l(s2_l)
 {
-    dp_matrix = new int[(((1 + s1_l) * s1_l) / 2 ) * (((1 + s2_l) * s2_l) / 2)]();
+    dp_matrix = new int[calc_total_size(s1_l, s2_l)]();
 }
 
 DPMatrix::~DPMatrix()
@@ -39,6 +39,11 @@ int DPMatrix::calc_delta(int i, int j, int k, int l) const
     int delta_mi = (j - 1) * k + l - 1;
     //std::cout << delta_i + delta_k + delta_mi << " (" << delta_i << " " << delta_k << " " << delta_mi << ") " << i << " " << j << " " << k << " " << l << "\n";
     return delta_i + delta_k + delta_mi;
+}
+
+long long int DPMatrix::calc_total_size(long long int s1, long long int s2) const
+{
+    return (((1 + s1) * s1) / 2 ) * (((1 + s2) * s2) / 2);
 }
 
 bool DPMatrix::check_border(const int &i, const int &j, const int &k, const int &l) const
