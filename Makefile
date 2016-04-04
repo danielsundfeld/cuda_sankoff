@@ -14,9 +14,9 @@ CPPSTD = -std=c++11
 endif
 
 BIN_DIR     = ./bin
-BIN         = $(BIN_DIR)/sankoff
+BIN_CPU_SANK = $(BIN_DIR)/sankoff
 
-TARGET      = $(BIN)
+TARGET      = $(BIN_CPU_SANK)
 
 SRC_DIR     = ./src
 INC_DIR     = ./src
@@ -52,7 +52,7 @@ ifdef PROFILE_INFORMATION
     LDFLAGS += -pg
 endif
 
-CPP_SRCS += \
+CPU_SANK_SRCS += \
     $(SRC_DIR)/main.cpp \
     $(SRC_DIR)/Cost.cpp \
     $(SRC_DIR)/DPMatrix.cpp \
@@ -65,7 +65,7 @@ INC_PATH += \
 CPPFLAGS += \
     $(INC_PATH) \
 
-OBJS = $(CPP_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+CPU_SANK_OBJS = $(CPU_SANK_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 all:	$(TARGET)
 
@@ -77,10 +77,10 @@ $(OBJ_DIR):
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-$(OBJS):	| $(OBJ_DIR)
+$(CPU_SANK_OBJS):	| $(OBJ_DIR)
 
-$(BIN):	$(OBJS) | $(BIN_DIR)
+$(BIN_CPU_SANK):	$(CPU_SANK_OBJS) | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -f $(TARGET) $(CPU_SANK_OBJS)
