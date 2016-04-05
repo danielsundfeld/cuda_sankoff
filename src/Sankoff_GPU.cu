@@ -12,16 +12,22 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     s2_l = (int) s2.length();
 
     cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
+    cudaMalloc(&seq_ctx, sizeof(sequences));
+    cudaMalloc(&(seq_ctx->s1), s1_l * sizeof(char));
+    cudaMalloc(&(seq_ctx->s2), s2_l * sizeof(char));
 }
 
 Sankoff_GPU::~Sankoff_GPU()
 {
     cudaFree(dp_matrix);
+    cudaFree(seq_ctx);
 }
 
-void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
+void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
 {
     int score = 0;
+    const int &s1_l = seq_ctx->s1_l;
+    const int &s2_l = seq_ctx->s2_l;
 
     if (j < i || j >= s1_l)
         return;
@@ -48,7 +54,7 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
     dp_matrix_put_pos(dp_matrix, i, j, k, l, score, s1_l, s2_l);
 }
 
-void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k)
+void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
 {
     if (i < 0)
         return;
@@ -59,7 +65,7 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
         for (int l = k; l < s2_l; ++l)
         {
             int j = inner_diag - (l - k);
-            expand_pos(dp_matrix, i, j, k, l, s1_l, s2_l);
+            expand_pos(dp_matrix, i, j, k, l, seq_ctx);
         }
     }
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
@@ -68,7 +74,7 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
         for (int l = inner_diag; l < s1_l; ++l)
         {
             int j = s1_l - 1 - (l - inner_diag);
-            expand_pos(dp_matrix, i, j, k, l, s1_l, s2_l);
+            expand_pos(dp_matrix, i, j, k, l, seq_ctx);
         }
     }
 }
@@ -86,7 +92,7 @@ int Sankoff_GPU::diag_sankoff()
         for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k)
         {
             int i = s2_l - 1 - outer_diag + s1_l - 1 - k;
-            expand_inner_matrix_diag(dp_matrix, i, k);
+            expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
         } //i
     } //outer_diag
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
@@ -95,7 +101,7 @@ int Sankoff_GPU::diag_sankoff()
         for (int k = 0; k <= s2_l - 1; ++k)
         {
             int i = outer_diag - k;
-            expand_inner_matrix_diag(dp_matrix, i, k);
+            expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
         }
     } //outer_diag
     //TODO copy to CPU

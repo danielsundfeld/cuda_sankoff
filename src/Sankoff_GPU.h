@@ -11,11 +11,14 @@ class Sankoff_GPU {
         int diag_sankoff(); //Run a pure sankoff algorithm
 
     private:
-        void expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k);
-        void expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l);
+        void expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx);
+        void expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx);
 
         //device_members
         int *dp_matrix;
+        sequences *seq_ctx;
+
+        //host_members
         std::string s1; 
         int s1_l;
         std::string s2;
