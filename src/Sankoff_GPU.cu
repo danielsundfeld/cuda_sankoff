@@ -4,85 +4,78 @@
 
 #include "Cost.h"
 
+long long int dp_matrix_calc_total_size(long long int s1, long long int s2)
+{
+    return (((1 + s1) * s1) / 2 ) * (((1 + s2) * s2) / 2);
+}
+
+int dp_matrix_calc_delta(int i, int j, int k, int l, const int &s1_l, const int &s2_l)
+{
+    i = s1_l - i;
+    j = s1_l - j;
+    k = s2_l - k;
+    l = s2_l - l;
+
+    int delta_i = ((1 + s1_l) * s1_l / 2) * (i * (i - 1) / 2);
+    int delta_k = i * (k * (k - 1) / 2);
+    int delta_mi = (j - 1) * k + l - 1;
+    return delta_i + delta_k + delta_mi;
+}
+
+bool dp_matrix_check_border(const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
+{
+    if (j < i)
+        return false;
+    if (l < k)
+        return false;
+    if (i < 0 || j < 0 || k < 0 || l < 0)
+        return false;
+    if (i > s1_l || j > s1_l || k > s2_l || l > s2_l)
+        return false;
+    return true;
+}
+
+int dp_matrix_get_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
+{
+    if (dp_matrix_check_border(i, j, k, l, s1_l, s2_l) == false)
+        return -1024;
+
+    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, s1_l, s2_l)];
+}
+
+void dp_matrix_put_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &val, const int &s1_l, const int &s2_l)
+{
+    dp_matrix[dp_matrix_calc_delta(i, j, k, l, s1_l, s2_l)] = val;
+}
+
 Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
-: dp_matrix(seq1.length(), seq2.length())
 {
     s1 = seq1;
     s1_l = (int) s1.length(); //TODO: throw exception if negative
     s2 = seq2;
     s2_l = (int) s2.length();
+
+    cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
 }
 
 Sankoff_GPU::~Sankoff_GPU()
 {
+    cudaFree(dp_matrix);
 }
 
-void Sankoff_GPU::print_orig(int i, int j, int k, int l) const
-{
-    std::cout << i << " " << j << " " << k << " "  << l << ":";
-}
-
-void Sankoff_GPU::print_index(int i, int j, int k, int l) const
-{
-    std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
-}
-
-// To visualize the data dependecy...
-void Sankoff_GPU::print_score_dep(int i, int j, int k, int l) const
-{
-    return;
-/*
-    print_orig(i, j, k, l);
-    print_index(i + 1, j, k, l);
-    print_orig(i, j, k, l);
-    print_index(i, j, k + 1, l);
-    print_orig(i, j, k, l);
-    print_index(i, j - 1, k, l);
-    print_orig(i, j, k, l);
-    print_index(i, j, k, l - 1);
-
-    print_orig(i, j, k, l);
-    print_index(i + 1, j, k + 1, l);
-    print_orig(i, j, k, l);
-    print_index(i, j - 1, k, l - 1);
-
-    print_orig(i, j, k, l);
-    print_index(i + 1, j - 1, k, l);
-    print_orig(i, j, k, l);
-    print_index(i, j, k + 1, l - 1);
-
-    print_orig(i, j, k, l);
-    print_index(i + 1, j - 1 , k + 1, l - 1);
-*/
-}
-
-// To visualize the data dependecy...
-void Sankoff_GPU::print_mb_dep(int i, int j, int k, int l, int m, int n) const
-{
-    return;
-/*
-    std::cout << i << " " << j << " " << k << " " << l << ":\t"
-        << i << " " << m << " " << k << " " << n
-        << " + "
-        << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
-*/
-}
-
-void Sankoff_GPU::expand_pos(const int &i, const int &j, const int &k, const int &l)
+void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
 {
     int score = 0;
 
-    print_score_dep(i, j, k, l);
-
-    score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
-    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
-    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, s1_l, s2_l) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, s1_l, s2_l) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, s1_l, s2_l) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, s1_l, s2_l) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, s1_l, s2_l) + Cost::match_score(s1[i], s2[k]));
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, s1_l, s2_l) + Cost::match_score(s1[j], s2[l]));
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, s1_l, s2_l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, s1_l, s2_l) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, s1_l, s2_l) +
             Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
@@ -90,22 +83,10 @@ void Sankoff_GPU::expand_pos(const int &i, const int &j, const int &k, const int
     {
         for (int n = k + 1; n < l; ++n)
         {
-            print_mb_dep(i, j, k, l, m, n);
-            score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
+            score = std::max(score, dp_matrix_get_pos(dp_matrix, i, m, k, n, s1_l, s2_l) + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, s1_l, s2_l));
         } //n
     } //m
-    dp_matrix.put_pos(i, j, k, l, score);
-}
-
-void Sankoff_GPU::expand_inner_matrix(const int &i, const int &k)
-{
-    for (int j = i; j < s1_l; ++j)
-    {
-        for (int l = k; l < s2_l; ++l)
-        {
-            expand_pos(i, j, k, l);
-        } //l
-    } //j
+    dp_matrix_put_pos(dp_matrix, i, j, k, l, score, s1_l, s2_l);
 }
 
 void Sankoff_GPU::expand_inner_matrix_diag(const int &i, const int &k)
@@ -117,7 +98,7 @@ void Sankoff_GPU::expand_inner_matrix_diag(const int &i, const int &k)
         {
             int j = inner_diag - (l - k);
             if (j >= i && j < s1_l)
-                expand_pos(i, j, k, l);
+                expand_pos(dp_matrix, i, j, k, l, s1_l, s2_l);
         }
     }
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
@@ -127,27 +108,9 @@ void Sankoff_GPU::expand_inner_matrix_diag(const int &i, const int &k)
         {
             int j = s1_l - 1 - (l - inner_diag);
             if (j >= i)
-                expand_pos(i, j, k, l);
+                expand_pos(dp_matrix, i, j, k, l, s1_l, s2_l);
         }
     }
-}
-
-int Sankoff_GPU::sankoff()
-{
-    std::cout << "Sankoff_GPU:"
-        << "\nseq1:\t" << s1
-        << "\nseq2:\t" << s2
-        << "\n";
-
-    for (int i = s1_l - 1; i >= 0; --i)
-    {
-        for (int k = s2_l - 1; k >= 0; --k)
-        {
-            expand_inner_matrix(i, k);
-        } //k
-    } //i
-    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
-    return 0;
 }
 
 int Sankoff_GPU::diag_sankoff()
@@ -176,6 +139,8 @@ int Sankoff_GPU::diag_sankoff()
                 expand_inner_matrix_diag(i, k);
         }
     } //outer_diag
-    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    //TODO copy to CPU
+    //std::cout << dp_matrix_get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << "FIM\n";
     return 0;
 }

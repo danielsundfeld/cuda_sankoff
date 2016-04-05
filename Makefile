@@ -96,7 +96,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 $(BIN_CPU_SANK):	$(CPU_SANK_OBJS) | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 #TODO FIXME FIXME FIXME
-$(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) obj/DPMatrix.o obj/Cost.o | $(BIN_DIR)
+$(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) obj/Cost.o | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(CUDAFLAGS) $(LDFLAGS)
 
 clean:
