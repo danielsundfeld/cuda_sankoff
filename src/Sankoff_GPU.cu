@@ -4,50 +4,6 @@
 
 #include "Cost.h"
 
-long long int dp_matrix_calc_total_size(long long int s1, long long int s2)
-{
-    return (((1 + s1) * s1) / 2 ) * (((1 + s2) * s2) / 2);
-}
-
-int dp_matrix_calc_delta(int i, int j, int k, int l, const int &s1_l, const int &s2_l)
-{
-    i = s1_l - i;
-    j = s1_l - j;
-    k = s2_l - k;
-    l = s2_l - l;
-
-    int delta_i = ((1 + s1_l) * s1_l / 2) * (i * (i - 1) / 2);
-    int delta_k = i * (k * (k - 1) / 2);
-    int delta_mi = (j - 1) * k + l - 1;
-    return delta_i + delta_k + delta_mi;
-}
-
-bool dp_matrix_check_border(const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
-{
-    if (j < i)
-        return false;
-    if (l < k)
-        return false;
-    if (i < 0 || j < 0 || k < 0 || l < 0)
-        return false;
-    if (i > s1_l || j > s1_l || k > s2_l || l > s2_l)
-        return false;
-    return true;
-}
-
-int dp_matrix_get_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &s1_l, const int &s2_l)
-{
-    if (dp_matrix_check_border(i, j, k, l, s1_l, s2_l) == false)
-        return -1024;
-
-    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, s1_l, s2_l)];
-}
-
-void dp_matrix_put_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &val, const int &s1_l, const int &s2_l)
-{
-    dp_matrix[dp_matrix_calc_delta(i, j, k, l, s1_l, s2_l)] = val;
-}
-
 Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 {
     s1 = seq1;
@@ -92,7 +48,7 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
     dp_matrix_put_pos(dp_matrix, i, j, k, l, score, s1_l, s2_l);
 }
 
-void Sankoff_GPU::expand_inner_matrix_diag(const int &i, const int &k)
+void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k)
 {
     if (i < 0)
         return;
@@ -130,7 +86,7 @@ int Sankoff_GPU::diag_sankoff()
         for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k)
         {
             int i = s2_l - 1 - outer_diag + s1_l - 1 - k;
-            expand_inner_matrix_diag(i, k);
+            expand_inner_matrix_diag(dp_matrix, i, k);
         } //i
     } //outer_diag
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
@@ -139,7 +95,7 @@ int Sankoff_GPU::diag_sankoff()
         for (int k = 0; k <= s2_l - 1; ++k)
         {
             int i = outer_diag - k;
-            expand_inner_matrix_diag(i, k);
+            expand_inner_matrix_diag(dp_matrix, i, k);
         }
     } //outer_diag
     //TODO copy to CPU

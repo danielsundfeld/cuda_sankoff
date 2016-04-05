@@ -65,6 +65,7 @@ GPU_CPP_SANK_SRCS += \
     $(SRC_DIR)/sankoff_gpu_main.cpp \
 
 GPU_CUDA_SANK_SRCS += \
+    $(SRC_DIR)/DPMatrix_GPU.cu \
     $(SRC_DIR)/Sankoff_GPU.cu \
 
 INC_PATH += \
