@@ -30,20 +30,19 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
 {
     int score = 0;
     const int &s1_l = seq_ctx->s1_l;
-    const int &s2_l = seq_ctx->s2_l;
 
     if (j < i || j >= s1_l)
         return;
 
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, s1_l, s2_l) + Cost::gap);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, s1_l, s2_l) + Cost::gap);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, s1_l, s2_l) + Cost::gap);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, s1_l, s2_l) + Cost::gap);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, s1_l, s2_l) + Cost::match_score(s1[i], s2[k]));
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, s1_l, s2_l) + Cost::match_score(s1[j], s2[l]));
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, s1_l, s2_l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, s1_l, s2_l) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, s1_l, s2_l) +
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, seq_ctx) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, seq_ctx) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, seq_ctx) + Cost::gap);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, seq_ctx) + Cost::match_score(s1[i], s2[k]));
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, seq_ctx) + Cost::match_score(s1[j], s2[l]));
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, seq_ctx) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, seq_ctx) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, seq_ctx) +
             Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
@@ -51,10 +50,10 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
     {
         for (int n = k + 1; n < l; ++n)
         {
-            score = std::max(score, dp_matrix_get_pos(dp_matrix, i, m, k, n, s1_l, s2_l) + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, s1_l, s2_l));
+            score = std::max(score, dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx) + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx));
         } //n
     } //m
-    dp_matrix_put_pos(dp_matrix, i, j, k, l, score, s1_l, s2_l);
+    dp_matrix_put_pos(dp_matrix, i, j, k, l, score, seq_ctx);
 }
 
 void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
