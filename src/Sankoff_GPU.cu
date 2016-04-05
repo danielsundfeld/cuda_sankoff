@@ -13,8 +13,11 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 
     cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
     cudaMalloc(&seq_ctx, sizeof(sequences));
-    cudaMalloc(&(seq_ctx->s1), s1_l * sizeof(char));
-    cudaMalloc(&(seq_ctx->s2), s2_l * sizeof(char));
+
+    cudaMemcpy(&(seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
+    cudaMemcpy(&(seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(&(seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
+    cudaMemcpy(&(seq_ctx->s2_l), &s2_l, sizeof(int), cudaMemcpyHostToDevice);
 }
 
 Sankoff_GPU::~Sankoff_GPU()

@@ -1,9 +1,12 @@
 #ifndef _DPMATRIX_GPU_H
 #define _DPMATRIX_GPU_H
+
+#define MAX_SEQ_SIZE 1024
+
 struct sequences {
-    char *s1;
+    char s1[MAX_SEQ_SIZE];
     int s1_l;
-    char *s2;
+    char s2[MAX_SEQ_SIZE];
     int s2_l;
 };
 
