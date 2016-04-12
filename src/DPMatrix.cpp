@@ -59,7 +59,7 @@ bool DPMatrix::check_border(const int &i, const int &j, const int &k, const int 
         return false;
     if (i < 0 || j < 0 || k < 0 || l < 0)
         return false;
-    if (i > s1_l || j > s1_l || k > s2_l || l > s2_l)
+    if (i >= s1_l || j >= s1_l || k >= s2_l || l >= s2_l)
         return false;
     return true;
 }
