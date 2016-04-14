@@ -15,7 +15,7 @@ int dp_matrix_calc_delta(int i, int j, int k, int l, const sequences* const seq_
     k = s2_l - k;
     l = s2_l - l;
 
-    int delta_i = ((1 + s1_l) * s1_l / 2) * (i * (i - 1) / 2);
+    int delta_i = ((1 + s2_l) * s2_l / 2) * (i * (i - 1) / 2);
     int delta_k = i * (k * (k - 1) / 2);
     int delta_mi = (j - 1) * k + l - 1;
     return delta_i + delta_k + delta_mi;
