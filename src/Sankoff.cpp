@@ -68,6 +68,9 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 {
     int score = 0;
 
+    if (j < i || j >= s1_l || l < k || l >= s2_l)
+        return;
+
     print_score_dep(i, j, k, l);
 
     score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
@@ -112,8 +115,7 @@ void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
         for (int l = k; l < s2_l; ++l)
         {
             int j = inner_diag - (l - k);
-            if (j >= i && j < s1_l && l >= k && l < s2_l)
-                expand_pos(i, j, k, l);
+            expand_pos(i, j, k, l);
         }
     }
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
@@ -122,8 +124,7 @@ void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
         for (int l = inner_diag; l < s1_l; ++l)
         {
             int j = s1_l - 1 - (l - inner_diag);
-            if (j >= i && j < s1_l && l >= k && l < s2_l)
-                expand_pos(i, j, k, l);
+            expand_pos(i, j, k, l);
         }
     }
 }
