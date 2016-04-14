@@ -68,8 +68,9 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
     for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)
-        for (int l = k; l < s2_l; ++l)
+        for (int tid = 0; tid < s2_l - k; ++tid)
         {
+            int l = tid + k;
             int j = inner_diag - (l - k);
             expand_pos(dp_matrix, i, j, k, l, seq_ctx);
         }
@@ -77,8 +78,9 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)
-        for (int l = inner_diag; l < s1_l; ++l)
+        for (int tid = 0; tid < s1_l - inner_diag; ++tid)
         {
+            int l = inner_diag + tid;
             int j = s1_l - 1 - (l - inner_diag);
             expand_pos(dp_matrix, i, j, k, l, seq_ctx);
         }
@@ -95,8 +97,9 @@ int Sankoff_GPU::diag_sankoff()
     for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)
-        for (int k = s2_l - 1 - outer_diag; k <= s2_l - 1; ++k)
+        for (int tid = 0; tid <= outer_diag; ++tid)
         {
+            int k = s2_l - 1 - outer_diag + tid;
             int i = s2_l - 1 - outer_diag + s1_l - 1 - k;
             expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
         } //i
@@ -104,8 +107,9 @@ int Sankoff_GPU::diag_sankoff()
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)
-        for (int k = 0; k <= s2_l - 1; ++k)
+        for (int tid = 0; tid <= s2_l - 1; ++tid)
         {
+            int k = tid;
             int i = outer_diag - k;
             expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
         }
