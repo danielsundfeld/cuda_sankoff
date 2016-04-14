@@ -25,6 +25,7 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 
 Sankoff_GPU::~Sankoff_GPU()
 {
+#define cudaFree free
     cudaFree(dp_matrix);
     cudaFree(seq_ctx);
 }
