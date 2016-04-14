@@ -31,7 +31,7 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
     int score = 0;
     const int &s1_l = seq_ctx->s1_l;
 
-    if (j < i || j >= s1_l)
+    if (j < i || j >= s1_l || l < k || l >= s2_l)
         return;
 
     score = std::max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx) + Cost::gap);

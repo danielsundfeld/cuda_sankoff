@@ -112,7 +112,7 @@ void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
         for (int l = k; l < s2_l; ++l)
         {
             int j = inner_diag - (l - k);
-            if (j >= i && j < s1_l)
+            if (j >= i && j < s1_l && l >= k && l < s2_l)
                 expand_pos(i, j, k, l);
         }
     }
@@ -122,7 +122,7 @@ void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
         for (int l = inner_diag; l < s1_l; ++l)
         {
             int j = s1_l - 1 - (l - inner_diag);
-            if (j >= i)
+            if (j >= i && j < s1_l && l >= k && l < s2_l)
                 expand_pos(i, j, k, l);
         }
     }
