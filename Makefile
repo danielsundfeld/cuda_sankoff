@@ -15,10 +15,12 @@ ifndef DEBUG
     LDFLAGS += -s
 else
     CPPFLAGS += -g
+    GPUFLAGS += -g -G
 endif
 
 ifdef OPTIMIZE
     CPPFLAGS += -O3
+    GPUFLAGS += -O3
 else
     CPPFLAGS += -O0
 endif
@@ -53,10 +55,9 @@ GPU_CUDA_SANK_SRCS += \
     $(SRC_DIR)/Sankoff_GPU.cu \
 
 INC_PATH += \
-    -I$(INC_DIR) \
+    -I$(INC_DIR)
 
-CPPFLAGS += \
-    $(INC_PATH) \
+CPPFLAGS += $(INC_PATH)
 
 CPU_SANK_OBJS = $(CPU_SANK_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GPU_CPP_SANK_OBJS = $(GPU_CPP_SANK_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
