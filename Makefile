@@ -1,18 +1,3 @@
-# Choose -std=c++11 or -std=c++0x
-CXXVERSION = $(shell $(CXX) -dumpversion | cut -b 1-3)
-ifneq "$(filter g++,$(CXX))" ""
-ifeq "$(CXXVERSION)" "4.6"
-CPPSTD = -std=c++0x
-endif
-ifeq "$(CXXVERSION)" "4.4"
-$(error Bad $(CXX) version $(CXXVERSION). Atomic operations are required)
-endif
-endif
-
-ifeq "$(CPPSTD)" ""
-CPPSTD = -std=c++11
-endif
-
 BIN_DIR     = ./bin
 BIN_CPU_SANK = $(BIN_DIR)/sankoff
 BIN_GPU_SANK = $(BIN_DIR)/cuda_sankoff
@@ -22,7 +7,7 @@ TARGET      = $(BIN_CPU_SANK) $(BIN_GPU_SANK)
 SRC_DIR     = ./src
 INC_DIR     = ./src
 OBJ_DIR     = ./obj
-CPPFLAGS   += -W -Wall -fopenmp $(CPPSTD)
+CPPFLAGS   += -W -Wall -fopenmp
 LDFLAGS    += -fopenmp -lstdc++ -lm
 
 ifndef DEBUG
