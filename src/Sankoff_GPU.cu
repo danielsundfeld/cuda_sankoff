@@ -11,9 +11,12 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     s2 = seq2;
     s2_l = (int) s2.length();
 
-    cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
-    cudaMalloc(&seq_ctx, sizeof(sequences));
+    //cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
+    //cudaMalloc(&seq_ctx, sizeof(sequences));
+    dp_matrix = (int*)malloc(dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
+    seq_ctx = (sequences*)malloc(sizeof(sequences));
 
+#define cudaMemcpy(x, y, z, w) memcpy(x, y, z)
     cudaMemcpy(&(seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
     cudaMemcpy(&(seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(&(seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
@@ -107,7 +110,7 @@ int Sankoff_GPU::diag_sankoff()
         }
     } //outer_diag
     //TODO copy to CPU
-    //std::cout << dp_matrix_get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << dp_matrix_get_pos(dp_matrix, 0, s1_l - 1, 0, s2_l - 1, seq_ctx) << std::endl;
     std::cout << "FIM\n";
     return 0;
 }
