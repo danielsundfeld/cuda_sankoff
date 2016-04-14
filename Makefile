@@ -24,7 +24,6 @@ INC_DIR     = ./src
 OBJ_DIR     = ./obj
 CPPFLAGS   += -W -Wall -fopenmp $(CPPSTD)
 LDFLAGS    += -fopenmp -lstdc++ -lm
-CUDAFLAGS  += -lcuda -lcudart -L/usr/local/cuda/lib64/
 
 ifndef DEBUG
     OPTIMIZE = yes
@@ -98,7 +97,7 @@ $(BIN_CPU_SANK):	$(CPU_SANK_OBJS) | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 #TODO FIXME FIXME FIXME
 $(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) obj/Cost.o | $(BIN_DIR)
-	$(CXX) $^ -o $@ $(CUDAFLAGS) $(LDFLAGS)
+	nvcc $^ -o $@ $(GPULDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(CPU_SANK_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS)
