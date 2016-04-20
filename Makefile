@@ -42,7 +42,6 @@ endif
 
 CPU_SANK_SRCS += \
     $(SRC_DIR)/main.cpp \
-    $(SRC_DIR)/Cost.cpp \
     $(SRC_DIR)/DPMatrix.cpp \
     $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Sankoff.cpp \
@@ -81,8 +80,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 
 $(BIN_CPU_SANK):	$(CPU_SANK_OBJS) | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
-#TODO FIXME FIXME FIXME
-$(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) obj/Cost.o | $(BIN_DIR)
+$(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) | $(BIN_DIR)
 	nvcc $^ -o $@ $(GPULDFLAGS)
 
 clean:

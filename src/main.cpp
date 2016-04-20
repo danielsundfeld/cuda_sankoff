@@ -13,6 +13,6 @@ int main(int argc, char *argv[])
     //Foldalign fold_instance("CCCCCCCCAAAAGGGGGGGG", "GUGCCAACAUUAGUUGGCAC", 20, 20);
     //return fold_instance.fold_align();
 
-    //omp_set_num_threads(4);
+    omp_set_num_threads(4);
     return fold_instance.diag_sankoff();
 }
