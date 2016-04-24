@@ -14,6 +14,12 @@ class Sankoff_GPU {
         void expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx);
         void expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx);
 
+        int expand_outer_matrix_diagonal_phase1(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx);
+        int expand_outer_matrix_diagonal_phase2(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx);
+
+        int expand_inner_matrix_diagonal_phase1(int *dp_matrix, int tid, int outer_diag, int i, int k, const sequences* const seq_ctx);
+        int expand_inner_matrix_diagonal_phase2(int *dp_matrix, int tid, int outer_diag, int i, int k, const sequences* const seq_ctx);
+
         //device_members
         int *dp_matrix;
         sequences *seq_ctx;
