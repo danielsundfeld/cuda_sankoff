@@ -30,7 +30,7 @@ Sankoff_GPU::~Sankoff_GPU()
 }
 
 //! Expand one cell with position \a i, \a j, \a k, \a l
-void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
+__device__ __host__ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
 {
     int score = 0;
     const int &s1_l = seq_ctx->s1_l;
@@ -64,7 +64,7 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
 }
 
 //! Expand inner matrix, first wave, from the begin to the main diagonal
-int Sankoff_GPU::expand_inner_matrix_diagonal_phase1(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
+__device__ __host__ int Sankoff_GPU::expand_inner_matrix_diagonal_phase1(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
 {
     int l = k + tid;
     int j = inner_diag - tid;
@@ -77,7 +77,7 @@ int Sankoff_GPU::expand_inner_matrix_diagonal_phase1(int *dp_matrix, int tid, in
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-int Sankoff_GPU::expand_inner_matrix_diagonal_phase2(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
+__device__ __host__ int Sankoff_GPU::expand_inner_matrix_diagonal_phase2(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
 {
     int l = inner_diag + tid;
     int j = seq_ctx->s1_l - 1 - tid;
@@ -90,7 +90,7 @@ int Sankoff_GPU::expand_inner_matrix_diagonal_phase2(int *dp_matrix, int tid, in
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
+__device__ __host__ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
 {
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
@@ -123,7 +123,7 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-int Sankoff_GPU::expand_outer_matrix_diagonal_phase1(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
+__device__ __host__ int Sankoff_GPU::expand_outer_matrix_diagonal_phase1(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
 {
     int k = seq_ctx->s2_l - 1 - outer_diag + tid;
     int i = seq_ctx->s1_l - 1 - tid;
@@ -136,7 +136,7 @@ int Sankoff_GPU::expand_outer_matrix_diagonal_phase1(int *dp_matrix, int tid, in
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-int Sankoff_GPU::expand_outer_matrix_diagonal_phase2(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
+__device__ __host__ int Sankoff_GPU::expand_outer_matrix_diagonal_phase2(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
 {
     int k = tid;
     int i = outer_diag - k;
