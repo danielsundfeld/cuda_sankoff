@@ -5,12 +5,10 @@
 #include "Cost.h"
 
 #define MAX(x, y) x > y ? x : y
-Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
+Sankoff_GPU::Sankoff_GPU(const std::string &s1, const std::string &s2)
 {
-    s1 = seq1;
-    s1_l = (int) s1.length(); //TODO: throw exception if negative
-    s2 = seq2;
-    s2_l = (int) s2.length();
+    int s1_l = (int) s1.length();
+    int s2_l = (int) s2.length();
 
     //cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
     //cudaMalloc(&seq_ctx, sizeof(sequences));
@@ -35,6 +33,9 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
 {
     int score = 0;
     const int &s1_l = seq_ctx->s1_l;
+    const int &s2_l = seq_ctx->s1_l;
+    const char* const &s1 = seq_ctx->s1;
+    const char* const &s2 = seq_ctx->s2;
 
     if (j < i || j >= s1_l || l < k || l >= s2_l)
         return;
@@ -63,6 +64,9 @@ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const i
 
 void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
 {
+    const int &s1_l = seq_ctx->s1_l;
+    const int &s2_l = seq_ctx->s2_l;
+
     if (i < 0)
         return;
 
@@ -90,9 +94,11 @@ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const i
 
 int Sankoff_GPU::diag_sankoff()
 {
+    const int &s1_l = seq_ctx->s1_l;
+    const int &s2_l = seq_ctx->s1_l;
     std::cout << "Sankoff_GPU:"
-        << "\nseq1:\t" << s1
-        << "\nseq2:\t" << s2
+        << "\nseq1:\t" << seq_ctx->s1
+        << "\nseq2:\t" << seq_ctx->s2
         << "\n";
 
     for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)

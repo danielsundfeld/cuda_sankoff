@@ -17,11 +17,5 @@ class Sankoff_GPU {
         //device_members
         int *dp_matrix;
         sequences *seq_ctx;
-
-        //host_members
-        std::string s1; 
-        int s1_l;
-        std::string s2;
-        int s2_l;
 };
 #endif
