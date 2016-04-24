@@ -169,7 +169,7 @@ int Sankoff_GPU::diag_sankoff()
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)
-        for (int tid = 0; tid <= s2_l - 1; ++tid)
+        for (int tid = 0; tid <= s2_l - 1 - (s1_l - 1 - outer_diag); ++tid)
         {
             expand_outer_matrix_diagonal_phase2(dp_matrix, tid, outer_diag, seq_ctx);
         }
