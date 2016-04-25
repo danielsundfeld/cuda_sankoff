@@ -5,17 +5,16 @@
 #include "Cost.h"
 
 #define MAX(x, y) x > y ? x : y
-Sankoff_GPU::Sankoff_GPU(const std::string &s1, const std::string &s2)
+Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 {
-    int s1_l = (int) s1.length();
-    int s2_l = (int) s2.length();
+    s1 = seq1;
+    s2 = seq2;
+    s1_l = (int) seq1.length();
+    s2_l = (int) seq2.length();
 
-    //cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
-    //cudaMalloc(&seq_ctx, sizeof(sequences));
-    dp_matrix = (int*)malloc(dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
-    seq_ctx = (sequences*)malloc(sizeof(sequences));
+    cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
+    cudaMalloc(&seq_ctx, sizeof(sequences));
 
-#define cudaMemcpy(x, y, z, w) memcpy(x, y, z)
     cudaMemcpy(&(seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
     cudaMemcpy(&(seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(&(seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
@@ -24,13 +23,12 @@ Sankoff_GPU::Sankoff_GPU(const std::string &s1, const std::string &s2)
 
 Sankoff_GPU::~Sankoff_GPU()
 {
-#define cudaFree free
     cudaFree(dp_matrix);
     cudaFree(seq_ctx);
 }
 
 //! Expand one cell with position \a i, \a j, \a k, \a l
-__device__ __host__ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
+__device__ void sankoff_gpu_expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     int score = 0;
     const int &s1_l = seq_ctx->s1_l;
@@ -64,33 +62,33 @@ __device__ __host__ void Sankoff_GPU::expand_pos(int *dp_matrix, const int &i, c
 }
 
 //! Expand inner matrix, first wave, from the begin to the main diagonal
-__device__ __host__ int Sankoff_GPU::expand_inner_matrix_diagonal_phase1(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(int *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
 {
-    int l = k + tid;
-    int j = inner_diag - tid;
+    int l = k + threadIdx.x;
+    int j = inner_diag - threadIdx.x;
 
-    expand_pos(dp_matrix, i, j, k, l, seq_ctx);
-    return 0;
+    sankoff_gpu_expand_pos(dp_matrix, i, j, k, l, seq_ctx);
+    return;
 }
 
 /*!
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-__device__ __host__ int Sankoff_GPU::expand_inner_matrix_diagonal_phase2(int *dp_matrix, int tid, int inner_diag, int i, int k, const sequences* const seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(int *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
 {
-    int l = inner_diag + tid;
-    int j = seq_ctx->s1_l - 1 - tid;
+    int l = inner_diag + threadIdx.x;
+    int j = seq_ctx->s1_l - 1 - threadIdx.x;
 
-    expand_pos(dp_matrix, i, j, k, l, seq_ctx);
-    return 0;
+    sankoff_gpu_expand_pos(dp_matrix, i, j, k, l, seq_ctx);
+    return;
 }
 
 /*!
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-__device__ __host__ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, const sequences* const seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, sequences* seq_ctx)
 {
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
@@ -101,21 +99,15 @@ __device__ __host__ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, c
     // First wave, from the begin to the main diagonal
     for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
     {
-#pragma omp parallel for schedule(dynamic,1)
-        for (int tid = 0; tid < s2_l - k; ++tid)
-        {
-            expand_inner_matrix_diagonal_phase1(dp_matrix, tid, inner_diag, i, k, seq_ctx);
-        }
+        sankoff_gpu_expand_inner_matrix_diagonal_phase1(dp_matrix, inner_diag, i, k, seq_ctx);
+        __syncthreads();
     }
 
     // Second wave, from the main diagonal to the end
     for (int inner_diag = k + 1; inner_diag < s2_l; ++inner_diag)
     {
-#pragma omp parallel for schedule(dynamic,1)
-        for (int tid = 0; tid < s1_l - inner_diag; ++tid)
-        {
-            expand_inner_matrix_diagonal_phase2(dp_matrix, tid, inner_diag, i, k, seq_ctx);
-        }
+        sankoff_gpu_expand_inner_matrix_diagonal_phase2(dp_matrix, inner_diag, i, k, seq_ctx);
+        __syncthreads();
     }
 }
 
@@ -123,59 +115,52 @@ __device__ __host__ void Sankoff_GPU::expand_inner_matrix_diag(int *dp_matrix, c
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-__device__ __host__ int Sankoff_GPU::expand_outer_matrix_diagonal_phase1(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(int *dp_matrix, int outer_diag, sequences* seq_ctx)
 {
-    int k = seq_ctx->s2_l - 1 - outer_diag + tid;
-    int i = seq_ctx->s1_l - 1 - tid;
+    int k = seq_ctx->s2_l - 1 - outer_diag + blockIdx.x;
+    int i = seq_ctx->s1_l - 1 - blockIdx.x;
 
-    expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
-    return 0;
+    sankoff_gpu_expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
+    return;
 }
 
 /*!
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-__device__ __host__ int Sankoff_GPU::expand_outer_matrix_diagonal_phase2(int *dp_matrix, int tid, int outer_diag, const sequences* const seq_ctx)
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(int *dp_matrix, int outer_diag, sequences* seq_ctx)
 {
-    int k = tid;
+    int k = blockIdx.x;
     int i = outer_diag - k;
 
-    expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
-    return 0;
+    sankoff_gpu_expand_inner_matrix_diag(dp_matrix, i, k, seq_ctx);
+    return;
 }
 
 //! Runs Sankoff in a Diagonal way
 int Sankoff_GPU::diag_sankoff()
 {
-    const int &s1_l = seq_ctx->s1_l;
-    const int &s2_l = seq_ctx->s1_l;
     std::cout << "Sankoff_GPU:"
-        << "\nseq1:\t" << seq_ctx->s1
-        << "\nseq2:\t" << seq_ctx->s2
+        << "\nseq1:\t" << s1
+        << "\nseq2:\t" << s2
         << "\n";
 
+    int threads_num = 0;
     // First wave, from the begin to the main diagonal
     for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
     {
-#pragma omp parallel for schedule(dynamic,1)
-        for (int tid = 0; tid <= outer_diag; ++tid)
-        {
-            expand_outer_matrix_diagonal_phase1(dp_matrix, tid, outer_diag, seq_ctx);
-        }
+        ++threads_num;
+        dim3 tn = ceil((float)threads_num/2);
+        sankoff_gpu_expand_outer_matrix_diagonal_phase1<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, seq_ctx);
     }
 
     // Second wave, from the main diagonal to the end
     for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
-#pragma omp parallel for schedule(dynamic,1)
-        for (int tid = 0; tid <= s2_l - 1 - (s1_l - 1 - outer_diag); ++tid)
-        {
-            expand_outer_matrix_diagonal_phase2(dp_matrix, tid, outer_diag, seq_ctx);
-        }
+        ++threads_num;
+        dim3 tn = ceil((float)threads_num/2);
+        sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, seq_ctx);
     } //outer_diag
-    //TODO copy to CPU
-    std::cout << dp_matrix_get_pos(dp_matrix, 0, s1_l - 1, 0, s2_l - 1, seq_ctx) << std::endl;
-    std::cout << "FIM\n";
+    std::cout << dp_matrix_get_val(dp_matrix, 0, s1_l - 1, 0, s2_l - 1, seq_ctx) << std::endl;
     return 0;
 }

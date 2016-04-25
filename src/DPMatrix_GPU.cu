@@ -5,7 +5,7 @@ long long int dp_matrix_calc_total_size(long long int s1, long long int s2)
     return (((1 + s1) * s1) / 2 ) * (((1 + s2) * s2) / 2);
 }
 
-__device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, const sequences* const seq_ctx)
+__device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, sequences* seq_ctx)
 {
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
@@ -21,7 +21,7 @@ __device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, const s
     return delta_i + delta_k + delta_mi;
 }
 
-__device__ __host__ bool dp_matrix_check_border(const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
+__device__ __host__ bool dp_matrix_check_border(const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
@@ -37,7 +37,7 @@ __device__ __host__ bool dp_matrix_check_border(const int &i, const int &j, cons
     return true;
 }
 
-__device__ __host__ int dp_matrix_get_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const sequences* const seq_ctx)
+__device__ __host__ int dp_matrix_get_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return -1024;
@@ -45,7 +45,19 @@ __device__ __host__ int dp_matrix_get_pos(int *dp_matrix, const int &i, const in
     return dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)];
 }
 
-__device__ __host__ void dp_matrix_put_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &val, const sequences* const seq_ctx)
+__device__ __host__ void dp_matrix_put_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, const int &val, sequences* seq_ctx)
 {
     dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)] = val;
+}
+
+__host__ int dp_matrix_get_val(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* sq)
+{
+    sequences seq_ctx;
+    //TODO: optimize
+    cudaMemcpy((void*)&seq_ctx, sq, sizeof(sequences), cudaMemcpyDeviceToHost);
+    if (dp_matrix_check_border(i, j, k, l, &seq_ctx) == false)
+        return -1024;
+    int val = 0;
+    cudaMemcpy((void*)(&val), (void*)(&dp_matrix[dp_matrix_calc_delta(i, j, k, l, &seq_ctx)]), sizeof(int), cudaMemcpyDeviceToHost);
+    return val;
 }

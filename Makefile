@@ -7,8 +7,12 @@ TARGET      = $(BIN_CPU_SANK) $(BIN_GPU_SANK)
 SRC_DIR     = ./src
 INC_DIR     = ./src
 OBJ_DIR     = ./obj
+
 CPPFLAGS   += -W -Wall -fopenmp
 LDFLAGS    += -fopenmp -lstdc++ -lm
+
+GPUFLAGS   += -dc -arch sm_30
+GPULDFLAGS   += -link -arch sm_30
 
 ifndef DEBUG
     OPTIMIZE = yes
