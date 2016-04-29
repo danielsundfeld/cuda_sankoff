@@ -12,19 +12,28 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     s1_l = (int) seq1.length();
     s2_l = (int) seq2.length();
 
-    cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int));
-    cudaMalloc(&seq_ctx, sizeof(sequences));
+    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int)));
+    check_gpu_code(cudaMalloc(&seq_ctx, sizeof(sequences)));
 
-    cudaMemcpy(&(seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
-    cudaMemcpy(&(seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(&(seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice);
-    cudaMemcpy(&(seq_ctx->s2_l), &s2_l, sizeof(int), cudaMemcpyHostToDevice);
+    check_gpu_code(cudaMemcpy(&(seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice));
+    check_gpu_code(cudaMemcpy(&(seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice));
+    check_gpu_code(cudaMemcpy(&(seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice));
+    check_gpu_code(cudaMemcpy(&(seq_ctx->s2_l), &s2_l, sizeof(int), cudaMemcpyHostToDevice));
 }
 
 Sankoff_GPU::~Sankoff_GPU()
 {
     cudaFree(dp_matrix);
     cudaFree(seq_ctx);
+}
+
+void Sankoff_GPU::check_gpu_code(cudaError_t code)
+{
+    if (code != cudaSuccess)
+    {
+        std::cerr << "Fatal error: " << cudaGetErrorString(code) << std::endl;
+        exit(1);
+    }
 }
 
 //! Expand one cell with position \a i, \a j, \a k, \a l
