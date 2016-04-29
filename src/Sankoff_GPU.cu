@@ -148,8 +148,8 @@ __global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(int *dp_matrix, 
 int Sankoff_GPU::diag_sankoff()
 {
     std::cout << "Sankoff_GPU:"
-        << "\nseq1:\t" << h_seq_ctx.s1
-        << "\nseq2:\t" << h_seq_ctx.s2
+        << "\nseq1: (" << h_seq_ctx.s1_l << ")\t" << h_seq_ctx.s1
+        << "\nseq2: (" << h_seq_ctx.s2_l << ")\t" << h_seq_ctx.s2
         << "\n";
 
     int threads_num = 0;

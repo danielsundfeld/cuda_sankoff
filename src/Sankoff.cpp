@@ -150,8 +150,8 @@ int Sankoff::sankoff()
 int Sankoff::diag_sankoff()
 {
     std::cout << "Sankoff:"
-        << "\nseq1:\t" << s1
-        << "\nseq2:\t" << s2
+        << "\nseq1: (" << s1_l << ")\t" << s1
+        << "\nseq2: (" << s2_l << ")\t" << s2
         << "\n";
 
     for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
