@@ -1,14 +1,15 @@
 #include <iostream>
-#include <omp.h>
 
+#include "sankoff_args.h"
 #include "Sankoff_GPU.h"
+#include "Sequences.h"
 
 int main(int argc, char *argv[])
 {
-    (void) argc;
-    (void) argv;
-    Sankoff_GPU fold_instance("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAAAAGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG", "GAUCGUAGUACUGAUGAUCGUAGCAUGGUCAUGCAGUACGUUGACGUCAGUCGUUGAUGCGUACUGAGCUGUACGUCAUG");
-    //Sankoff_GPU fold_instance("CCCCCCCCAAAAGGGGGGGG", "GUGCCAACAUUAGUUGGCAC");
+    int error;
+    if ((error = load_file(argc, argv)))
+        return error;
+    Sankoff_GPU fold_instance(Sequences::get_instance()->get_seq(0), Sequences::get_instance()->get_seq(1));
 
     return fold_instance.diag_sankoff();
 }

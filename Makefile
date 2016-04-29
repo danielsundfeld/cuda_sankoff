@@ -44,6 +44,11 @@ ifdef PROFILE_INFORMATION
     LDFLAGS += -pg
 endif
 
+COMMON_SRCS += \
+    $(SRC_DIR)/read_fasta.cpp \
+    $(SRC_DIR)/sankoff_args.cpp \
+    $(SRC_DIR)/Sequences.cpp \
+
 CPU_SANK_SRCS += \
     $(SRC_DIR)/main.cpp \
     $(SRC_DIR)/DPMatrix.cpp \
@@ -62,6 +67,7 @@ INC_PATH += \
 
 CPPFLAGS += $(INC_PATH)
 
+COMMON_OBJS = $(COMMON_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 CPU_SANK_OBJS = $(CPU_SANK_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GPU_CPP_SANK_OBJS = $(GPU_CPP_SANK_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GPU_CUDA_SANK_OBJS = $(GPU_CUDA_SANK_SRCS:$(SRC_DIR)/%.cu=$(OBJ_DIR)/%.o)
@@ -73,6 +79,7 @@ $(BIN_DIR):
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
+$(COMMON_OBJS): 	| $(OBJ_DIR)
 $(CPU_SANK_OBJS):	| $(OBJ_DIR)
 $(GPU_CUDA_SANK_OBJS):	| $(OBJ_DIR)
 $(GPU_CPP_SANK_OBJS):	| $(OBJ_DIR)
@@ -82,10 +89,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 	nvcc $(GPUFLAGS) -c -o $@ $<
 
-$(BIN_CPU_SANK):	$(CPU_SANK_OBJS) | $(BIN_DIR)
+$(BIN_CPU_SANK):	$(COMMON_OBJS) $(CPU_SANK_OBJS) | $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
-$(BIN_GPU_SANK):	$(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) | $(BIN_DIR)
+$(BIN_GPU_SANK):	$(COMMON_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) | $(BIN_DIR)
 	nvcc $^ -o $@ $(GPULDFLAGS)
 
 clean:
-	rm -f $(TARGET) $(CPU_SANK_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS)
+	rm -f $(TARGET) $(COMMON_OBJS) $(CPU_SANK_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS)

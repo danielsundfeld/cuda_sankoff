@@ -2,16 +2,16 @@
 #include <omp.h>
 
 #include "Foldalign.h"
+#include "sankoff_args.h"
 #include "Sankoff.h"
+#include "Sequences.h"
 
 int main(int argc, char *argv[])
 {
-    (void) argc;
-    (void) argv;
-    Sankoff fold_instance("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAAAAGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG", "GAUCGUAGUACUGAUGAUCGUAGCAUGGUCAUGCAGUACGUUGACGUCAGUCGUUGAUGCGUACUGAGCUGUACGUCAUG");
-    //Sankoff fold_instance("CCCCCCCCAAAAGGGGGGGG", "GUGCCAACAUUAGUUGGCAC");
-    //Foldalign fold_instance("CCCCCCCCAAAAGGGGGGGG", "GUGCCAACAUUAGUUGGCAC", 20, 20);
-    //return fold_instance.fold_align();
+    int error;
+    if ((error = load_file(argc, argv)))
+        return error;
+    Sankoff fold_instance(Sequences::get_instance()->get_seq(0), Sequences::get_instance()->get_seq(1));
 
     omp_set_num_threads(4);
     return fold_instance.diag_sankoff();
