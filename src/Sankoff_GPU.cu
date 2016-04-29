@@ -1,24 +1,22 @@
 #include "Sankoff_GPU.h"
 
 #include <iostream>
+#include <cstring>
 
 #include "Cost.h"
 
 #define MAX(x, y) x > y ? x : y
 Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 {
-    s1 = seq1;
-    s2 = seq2;
-    s1_l = (int) seq1.length();
-    s2_l = (int) seq2.length();
+    h_seq_ctx = sequences();
+    std::strcpy(h_seq_ctx.s1, seq1.c_str());
+    std::strcpy(h_seq_ctx.s2, seq2.c_str());
+    h_seq_ctx.s1_l = (int) seq1.length();
+    h_seq_ctx.s2_l = (int) seq2.length();
 
-    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(s1_l, s2_l) * sizeof(int)));
+    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(int)));
     check_gpu_code(cudaMalloc(&d_seq_ctx, sizeof(sequences)));
-
-    check_gpu_code(cudaMemcpy(&(d_seq_ctx->s1), s1.c_str(), (s1_l + 1) * sizeof(char), cudaMemcpyHostToDevice));
-    check_gpu_code(cudaMemcpy(&(d_seq_ctx->s1_l), &s1_l, sizeof(int), cudaMemcpyHostToDevice));
-    check_gpu_code(cudaMemcpy(&(d_seq_ctx->s2), s2.c_str(), (s2_l + 1) * sizeof(char), cudaMemcpyHostToDevice));
-    check_gpu_code(cudaMemcpy(&(d_seq_ctx->s2_l), &s2_l, sizeof(int), cudaMemcpyHostToDevice));
+    check_gpu_code(cudaMemcpy(d_seq_ctx, &h_seq_ctx, sizeof(sequences), cudaMemcpyHostToDevice));
 }
 
 Sankoff_GPU::~Sankoff_GPU()
@@ -150,13 +148,13 @@ __global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(int *dp_matrix, 
 int Sankoff_GPU::diag_sankoff()
 {
     std::cout << "Sankoff_GPU:"
-        << "\nseq1:\t" << s1
-        << "\nseq2:\t" << s2
+        << "\nseq1:\t" << h_seq_ctx.s1
+        << "\nseq2:\t" << h_seq_ctx.s2
         << "\n";
 
     int threads_num = 0;
     // First wave, from the begin to the main diagonal
-    for (int outer_diag = 0; outer_diag <= s2_l - 1; ++outer_diag)
+    for (int outer_diag = 0; outer_diag <= h_seq_ctx.s2_l - 1; ++outer_diag)
     {
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
@@ -164,12 +162,12 @@ int Sankoff_GPU::diag_sankoff()
     }
 
     // Second wave, from the main diagonal to the end
-    for (int outer_diag = s1_l - 2; outer_diag >= 0 ; --outer_diag)
+    for (int outer_diag = h_seq_ctx.s1_l - 2; outer_diag >= 0 ; --outer_diag)
     {
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx);
     } //outer_diag
-    std::cout << dp_matrix_get_val(dp_matrix, 0, s1_l - 1, 0, s2_l - 1, d_seq_ctx) << std::endl;
+    std::cout << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, d_seq_ctx) << std::endl;
     return 0;
 }

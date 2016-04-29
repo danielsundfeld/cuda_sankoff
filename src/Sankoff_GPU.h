@@ -15,10 +15,7 @@ class Sankoff_GPU {
 
     private:
         //host members
-        std::string s1;
-        std::string s2;
-        int s1_l;
-        int s2_l;
+        sequences h_seq_ctx;
 
         //device_members
         int *dp_matrix;
