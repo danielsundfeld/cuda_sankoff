@@ -50,14 +50,11 @@ __device__ __host__ void dp_matrix_put_pos(int *dp_matrix, const int &i, const i
     dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)] = val;
 }
 
-__host__ int dp_matrix_get_val(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* sq)
+__host__ int dp_matrix_get_val(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
-    sequences seq_ctx;
-    //TODO: optimize
-    cudaMemcpy((void*)&seq_ctx, sq, sizeof(sequences), cudaMemcpyDeviceToHost);
-    if (dp_matrix_check_border(i, j, k, l, &seq_ctx) == false)
+    if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return -1024;
     int val = 0;
-    cudaMemcpy((void*)(&val), (void*)(&dp_matrix[dp_matrix_calc_delta(i, j, k, l, &seq_ctx)]), sizeof(int), cudaMemcpyDeviceToHost);
+    cudaMemcpy((void*)(&val), (void*)(&dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)]), sizeof(int), cudaMemcpyDeviceToHost);
     return val;
 }

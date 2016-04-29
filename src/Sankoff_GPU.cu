@@ -168,6 +168,6 @@ int Sankoff_GPU::diag_sankoff()
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx);
     } //outer_diag
-    std::cout << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, d_seq_ctx) << std::endl;
+    std::cout << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, &h_seq_ctx) << std::endl;
     return 0;
 }
