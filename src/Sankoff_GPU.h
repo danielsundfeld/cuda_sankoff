@@ -22,7 +22,7 @@ class Sankoff_GPU {
 
         //device_members
         int *dp_matrix;
-        sequences *seq_ctx;
+        sequences *d_seq_ctx;
 };
 
 #ifdef __CUDACC__
