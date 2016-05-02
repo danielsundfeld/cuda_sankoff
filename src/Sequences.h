@@ -16,6 +16,7 @@ class Sequences
         static Sequences* get_instance() { return &instance; };
         int set_seq(const std::string &x);
         const std::string& get_seq(int x) const { return seqs.at(x); };
+        static int get_nseq() { return n_seq; };
 
     private:
         static int n_seq;
