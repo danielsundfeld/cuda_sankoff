@@ -173,6 +173,6 @@ int Sankoff::diag_sankoff()
                 expand_inner_matrix_diag(i, k);
         }
     } //outer_diag
-    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << "Score: " << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
     return 0;
 }
