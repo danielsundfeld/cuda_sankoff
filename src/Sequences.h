@@ -21,6 +21,6 @@ class Sequences
         static int n_seq;
         static Sequences instance;
         std::vector<std::string> seqs;
-        Sequences();
+        Sequences() { };
 };
 #endif
