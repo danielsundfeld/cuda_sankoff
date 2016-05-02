@@ -68,7 +68,7 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 {
     int score = 0;
 
-    if (j < i || j >= s1_l || l < k || l >= s2_l)
+    if (dp_matrix.check_border(i, j, k, l) == false)
         return;
 
     print_score_dep(i, j, k, l);
@@ -109,6 +109,9 @@ void Sankoff::expand_inner_matrix(const int &i, const int &k)
 
 void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
 {
+    if (i < 0 || i >= s1_l || k < 0 || k >= s2_l)
+        return;
+
     for (int inner_diag = i; inner_diag < s1_l; ++inner_diag)
     {
 #pragma omp parallel for schedule(dynamic,1)

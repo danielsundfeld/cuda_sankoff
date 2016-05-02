@@ -13,6 +13,6 @@ int main(int argc, char *argv[])
         return error;
     Sankoff fold_instance(Sequences::get_instance()->get_seq(0), Sequences::get_instance()->get_seq(1));
 
-    omp_set_num_threads(4);
+//    omp_set_num_threads(4);
     return fold_instance.diag_sankoff();
 }

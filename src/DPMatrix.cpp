@@ -29,6 +29,9 @@ int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
 
 void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const int &val)
 {
+    if (check_border(i, j, k, l) == false)
+        return;
+
     dp_matrix[calc_delta(i, j, k, l)] = val;
 }
 

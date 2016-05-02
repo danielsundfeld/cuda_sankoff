@@ -38,12 +38,10 @@ void Sankoff_GPU::check_gpu_code(cudaError_t code)
 __device__ void sankoff_gpu_expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     int score = 0;
-    const int &s1_l = seq_ctx->s1_l;
-    const int &s2_l = seq_ctx->s1_l;
     const char* const &s1 = seq_ctx->s1;
     const char* const &s2 = seq_ctx->s2;
 
-    if (j < i || j >= s1_l || l < k || l >= s2_l)
+    if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return;
 
     score = MAX(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx) + Cost::gap);
@@ -100,7 +98,7 @@ __device__ void sankoff_gpu_expand_inner_matrix_diag(int *dp_matrix, const int &
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
 
-    if (i < 0)
+    if (i < 0 || i >= s1_l || k < 0 || k >= s2_l)
         return;
 
     // First wave, from the begin to the main diagonal
