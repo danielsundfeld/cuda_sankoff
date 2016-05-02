@@ -15,5 +15,5 @@ int load_file(int argc, char *argv[])
 {
     if (argc == 1)
         return usage(argv[0]);
-    return read_fasta_file(argv[1]);
+    return read_fasta_file(argv[1], 2);
 }

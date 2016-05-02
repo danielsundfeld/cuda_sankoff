@@ -39,13 +39,20 @@ int read_fasta_file_core(const std::string &name)
 }
 
 /*!
- * Read the \a name fasta file, loading it to the Sequences singleton
+ * Read the \a name fasta file, loading it to the Sequences singleton.
+ * Fail if the number of sequences is non-null and not equal to \a limit
  */
-int read_fasta_file(const std::string &name)
+int read_fasta_file(const std::string &name, const int &check)
 {
     try
     {
-        return read_fasta_file_core(name);
+        int ret = read_fasta_file_core(name);
+        if (ret == 0 && check != 0 && Sequences::get_nseq() != check)
+        {
+            std::cerr << "Invalid fasta file: must have " << check << " sequences.\n";
+            return -1;
+        }
+        return ret;
     }
     catch (std::exception &e)
     {

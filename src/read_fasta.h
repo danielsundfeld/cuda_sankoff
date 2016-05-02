@@ -6,5 +6,5 @@
 #define _READ_FASTA_FILE
 #include <string>
 
-int read_fasta_file(const std::string &name);
+int read_fasta_file(const std::string &name, const int &check = 0);
 #endif
