@@ -5,6 +5,8 @@
 
 #include "Cost.h"
 
+#include "DPMatrix_GPU.cu"
+
 #define MAX(x, y) x > y ? x : y
 Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
 {
