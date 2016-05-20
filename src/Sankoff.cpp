@@ -135,8 +135,8 @@ void Sankoff::expand_inner_matrix_diag(const int &i, const int &k)
 int Sankoff::sankoff()
 {
     std::cout << "Sankoff:"
-        << "\nseq1:\t" << s1
-        << "\nseq2:\t" << s2
+        << "\nseq1: (" << s1_l << ")\t" << s1
+        << "\nseq2: (" << s2_l << ")\t" << s2
         << "\n";
 
     for (int i = s1_l - 1; i >= 0; --i)

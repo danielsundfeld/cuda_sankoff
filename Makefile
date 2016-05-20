@@ -58,8 +58,8 @@ CPU_SANK_SRCS += \
 GPU_CPP_SANK_SRCS += \
     $(SRC_DIR)/sankoff_gpu_main.cpp \
 
+# It is faster to include all .cu in the same .cu
 GPU_CUDA_SANK_SRCS += \
-    $(SRC_DIR)/DPMatrix_GPU.cu \
     $(SRC_DIR)/Sankoff_GPU.cu \
 
 INC_PATH += \
