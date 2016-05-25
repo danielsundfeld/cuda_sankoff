@@ -73,6 +73,16 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 
     print_score_dep(i, j, k, l);
 
+    /*
+     * Explanations of this recursion functions can be see at:
+     *
+     * - Havgaard, et al. "Fast Pairwise Structural RNA Alignments by
+     * Pruning of the Dynamical Programming Matrix".
+     * - Havgaard, et al. "Pairwise local structural alignment of RNA sequences
+     * with sequence similarity less than 40%".
+     * - Torarinsson, et al. "Multiple structural alignment and clustering of RNA sequences
+     * - Ziv-Ukelson, et al. "A faster algorithm for RNA co-folding"
+    */
     score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
     score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
     score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
