@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     int error;
-    if ((error = load_file(argc, argv)))
+    if ((error = load_args(argc, argv)))
         return error;
     Sankoff_GPU fold_instance(Sequences::get_instance()->get_seq(0), Sequences::get_instance()->get_seq(1));
 

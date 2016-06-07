@@ -9,10 +9,11 @@
 int main(int argc, char *argv[])
 {
     int error;
-    if ((error = load_file(argc, argv)))
+    int threads_num = 1;
+    if ((error = load_args(argc, argv, &threads_num)))
         return error;
     Sankoff fold_instance(Sequences::get_instance()->get_seq(0), Sequences::get_instance()->get_seq(1));
 
-//    omp_set_num_threads(4);
+    omp_set_num_threads(threads_num);
     return fold_instance.diag_sankoff();
 }
