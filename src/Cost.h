@@ -10,10 +10,10 @@ class Cost {
     public:
         enum {
             gap = 0,
-            mismatch = 1,
-            match = 2,
+            mismatch = 0,
+            match = 0,
 
-            base_paired = 2,
+            base_paired = 0,
             unpaired = 0,
         };
         CUDAFLAGS static int base_score(const char &a, const char &b); //'alpha' score
