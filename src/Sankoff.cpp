@@ -66,7 +66,7 @@ void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 
 void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 {
-    int score = 0;
+    float score = 0;
 
     if (dp_matrix.check_border(i, j, k, l) == false)
         return;

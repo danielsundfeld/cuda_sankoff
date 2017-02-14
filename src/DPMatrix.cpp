@@ -6,7 +6,7 @@ DPMatrix::DPMatrix(const int &s1_l, const int &s2_l)
 : s1_l(s1_l),
   s2_l(s2_l)
 {
-    dp_matrix = new int[calc_total_size(s1_l, s2_l)]();
+    dp_matrix = new float[calc_total_size(s1_l, s2_l)]();
 }
 
 DPMatrix::~DPMatrix()
@@ -19,7 +19,7 @@ long long int DPMatrix::get_total_size() const
     return calc_total_size(s1_l, s2_l);
 }
 
-int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
+float DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
 {
     if (check_border(i, j, k, l) == false)
         return -1024;
@@ -27,7 +27,7 @@ int DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
     return dp_matrix[calc_delta(i, j, k, l)];
 }
 
-void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const int &val)
+void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const float &val)
 {
     if (check_border(i, j, k, l) == false)
         return;

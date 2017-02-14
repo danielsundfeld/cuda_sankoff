@@ -18,7 +18,7 @@ class Sankoff_GPU {
         sequences h_seq_ctx;
 
         //device_members
-        int *dp_matrix;
+        float *dp_matrix;
         sequences *d_seq_ctx;
 };
 

@@ -16,7 +16,7 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     h_seq_ctx.s1_l = (int) seq1.length();
     h_seq_ctx.s2_l = (int) seq2.length();
 
-    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(int)));
+    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(float)));
     check_gpu_code(cudaMalloc(&d_seq_ctx, sizeof(sequences)));
     check_gpu_code(cudaMemcpy(d_seq_ctx, &h_seq_ctx, sizeof(sequences), cudaMemcpyHostToDevice));
 }
@@ -37,9 +37,9 @@ void Sankoff_GPU::check_gpu_code(cudaError_t code)
 }
 
 //! Expand one cell with position \a i, \a j, \a k, \a l
-__device__ void sankoff_gpu_expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
+__device__ void sankoff_gpu_expand_pos(float *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
-    int score = 0;
+    float score = 0;
     const char* const &s1 = seq_ctx->s1;
     const char* const &s2 = seq_ctx->s2;
 
@@ -69,7 +69,7 @@ __device__ void sankoff_gpu_expand_pos(int *dp_matrix, const int &i, const int &
 }
 
 //! Expand inner matrix, first wave, from the begin to the main diagonal
-__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(int *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(float *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
 {
     int l = k + threadIdx.x;
     int j = inner_diag - threadIdx.x;
@@ -82,7 +82,7 @@ __device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(int *dp_matrix, 
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(int *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(float *dp_matrix, int inner_diag, int i, int k, sequences* seq_ctx)
 {
     int l = inner_diag + threadIdx.x;
     int j = seq_ctx->s1_l - 1 - threadIdx.x;
@@ -95,7 +95,7 @@ __device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(int *dp_matrix, 
  * Expand one inner_matrix cell with coord \a i and \k, id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-__device__ void sankoff_gpu_expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, sequences* seq_ctx)
+__device__ void sankoff_gpu_expand_inner_matrix_diag(float *dp_matrix, const int &i, const int &k, sequences* seq_ctx)
 {
     const int &s1_l = seq_ctx->s1_l;
     const int &s2_l = seq_ctx->s2_l;
@@ -122,7 +122,7 @@ __device__ void sankoff_gpu_expand_inner_matrix_diag(int *dp_matrix, const int &
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the first wave, from the begin to the main diagonal.
  */
-__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(int *dp_matrix, int outer_diag, sequences* seq_ctx)
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(float *dp_matrix, int outer_diag, sequences* seq_ctx)
 {
     int k = seq_ctx->s2_l - 1 - outer_diag + blockIdx.x;
     int i = seq_ctx->s1_l - 1 - blockIdx.x;
@@ -135,7 +135,7 @@ __global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(int *dp_matrix, 
  * Expand one outer_matrix cell with id \a tid, from one diagonal \a diag.
  * This is the second wave, from the main diagonal to the end.
  */
-__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(int *dp_matrix, int outer_diag, sequences* seq_ctx)
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(float *dp_matrix, int outer_diag, sequences* seq_ctx)
 {
     int k = blockIdx.x;
     int i = outer_diag - k;

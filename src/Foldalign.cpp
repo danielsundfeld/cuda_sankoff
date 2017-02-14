@@ -40,7 +40,7 @@ int Foldalign::fold_align()
 
                 for (int l = l_begin; l < l_end; ++l)
                 {
-                    int score = 0;
+                    float score = 0;
 
                     print_score_dep(i, j, k, l);
 
