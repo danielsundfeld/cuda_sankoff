@@ -5,7 +5,7 @@ BIN_GPU_SANK = $(BIN_DIR)/cuda_sankoff
 TARGET      = $(BIN_CPU_SANK) $(BIN_GPU_SANK)
 
 SRC_DIR     = ./src
-INC_DIR     = ./src
+INC_DIR     = ./src -I./ViennaRNA-2.3.3/H/ -I./ViennaRNA-2.3.3/src/
 OBJ_DIR     = ./obj
 
 CPPFLAGS   += -W -Wall -fopenmp
@@ -13,6 +13,8 @@ LDFLAGS    += -fopenmp -lstdc++ -lm
 
 GPUFLAGS   += -dc -arch sm_30
 GPULDFLAGS   += -link -arch sm_30
+
+VIENNA_LIB  = ./ViennaRNA-2.3.3/src/ViennaRNA/libRNA.a
 
 ifndef DEBUG
     OPTIMIZE = yes
@@ -48,6 +50,7 @@ COMMON_SRCS += \
     $(SRC_DIR)/read_fasta.cpp \
     $(SRC_DIR)/sankoff_args.cpp \
     $(SRC_DIR)/Sequences.cpp \
+    $(SRC_DIR)/bp_probs.cpp \
 
 CPU_SANK_SRCS += \
     $(SRC_DIR)/main.cpp \
@@ -90,9 +93,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 	nvcc $(GPUFLAGS) -c -o $@ $<
 
 $(BIN_CPU_SANK):	$(COMMON_OBJS) $(CPU_SANK_OBJS) | $(BIN_DIR)
-	$(CXX) $^ -o $@ $(LDFLAGS)
+	$(CXX) $^ $(VIENNA_LIB) -o $@ $(LDFLAGS)
 $(BIN_GPU_SANK):	$(COMMON_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS) | $(BIN_DIR)
-	nvcc $^ -o $@ $(GPULDFLAGS)
+	nvcc $^ $(VIENNA_LIB) -o $@ $(GPULDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(COMMON_OBJS) $(CPU_SANK_OBJS) $(GPU_CUDA_SANK_OBJS) $(GPU_CPP_SANK_OBJS)
