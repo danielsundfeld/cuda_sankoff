@@ -53,7 +53,7 @@ COMMON_SRCS += \
     $(SRC_DIR)/bp_probs.cpp \
 
 CPU_SANK_SRCS += \
-    $(SRC_DIR)/main.cpp \
+    $(SRC_DIR)/sankoff_cpu_main.cpp \
     $(SRC_DIR)/DPMatrix.cpp \
     $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Sankoff.cpp \
