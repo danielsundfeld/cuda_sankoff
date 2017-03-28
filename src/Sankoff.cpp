@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "bp_probs.h"
 #include "Cost.h"
 
 Sankoff::Sankoff(const std::string &seq1, const std::string &seq2)
@@ -11,10 +12,17 @@ Sankoff::Sankoff(const std::string &seq1, const std::string &seq2)
     s1_l = (int) s1.length(); //TODO: throw exception if negative
     s2 = seq2;
     s2_l = (int) s2.length();
+    bp1 = new bp_prob();
+    bp2 = new bp_prob();
+
+    get_bp_prob(seq1, bp1);
+    get_bp_prob(seq2, bp2);
 }
 
 Sankoff::~Sankoff()
 {
+    delete bp1;
+    delete bp2;
 }
 
 void Sankoff::print_orig(int i, int j, int k, int l) const

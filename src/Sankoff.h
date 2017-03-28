@@ -2,6 +2,7 @@
 #define _SANKOFF_H
 #include <string>
 
+#include "bp_probs.h"
 #include "DPMatrix.h"
 
 class Sankoff {
@@ -24,6 +25,8 @@ class Sankoff {
         int s2_l;
 
     private:
+        struct bp_prob *bp1, *bp2;
+
         void expand_inner_matrix(const int &i, const int &k);
         void expand_inner_matrix_diag(const int &i, const int &k);
         void expand_pos(const int &i, const int &j, const int &k, const int &l);
