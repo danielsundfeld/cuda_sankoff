@@ -1,3 +1,5 @@
+#include "bp_probs.h"
+
 #include <string>
 #include <math.h>
 #include <stdlib.h>
@@ -8,11 +10,6 @@ extern "C" {
 #include "ViennaRNA/data_structures.h"
 #include "ViennaRNA/part_func.h"
 }
-
-struct bp_prob {
-    int size;
-    float m[1024][1024];
-};
 
 size_t get_pos_from_vc(vrna_fold_compound_t  *vc, size_t i,size_t j)
 {
@@ -54,6 +51,14 @@ void set_md_config(vrna_md_t *md)
     md->backtrack = 0;
     md->noLP = 0;
     md->compute_bpp = 1;
+}
+
+int get_bp_prob(const std::string &seq, struct bp_prob *bp)
+{
+    vrna_md_t md;
+    set_md_config(&md);
+    get_bp_prob(seq.c_str(), &md, bp);
+    return 0;
 }
 
 int _main(void)
