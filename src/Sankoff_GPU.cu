@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 
+#include "bp_probs.h"
 #include "Cost.h"
 
 #include "DPMatrix_GPU.cu"
@@ -16,15 +17,30 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     h_seq_ctx.s1_l = (int) seq1.length();
     h_seq_ctx.s2_l = (int) seq2.length();
 
+    h_bp1 = new bp_prob();
+    h_bp2 = new bp_prob();
+
+    get_bp_prob(seq1, h_bp1);
+    get_bp_prob(seq2, h_bp2);
+
     check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(float)));
     check_gpu_code(cudaMalloc(&d_seq_ctx, sizeof(sequences)));
     check_gpu_code(cudaMemcpy(d_seq_ctx, &h_seq_ctx, sizeof(sequences), cudaMemcpyHostToDevice));
+
+    check_gpu_code(cudaMalloc(&d_bp1, sizeof(struct bp_prob)));
+    check_gpu_code(cudaMemcpy(d_bp1, h_bp1, sizeof(struct bp_prob), cudaMemcpyHostToDevice));
+    check_gpu_code(cudaMalloc(&d_bp2, sizeof(struct bp_prob)));
+    check_gpu_code(cudaMemcpy(d_bp2, h_bp2, sizeof(struct bp_prob), cudaMemcpyHostToDevice));
 }
 
 Sankoff_GPU::~Sankoff_GPU()
 {
+    delete h_bp1;
+    delete h_bp2;
     cudaFree(dp_matrix);
     cudaFree(d_seq_ctx);
+    cudaFree(d_bp1);
+    cudaFree(d_bp2);
 }
 
 void Sankoff_GPU::check_gpu_code(cudaError_t code)

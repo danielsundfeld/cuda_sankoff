@@ -2,6 +2,7 @@
 #define _SANKOFF_GPU_H
 #include <string>
 
+#include "bp_probs.h"
 #include "DPMatrix_GPU.h"
 
 class Sankoff_GPU {
@@ -16,10 +17,12 @@ class Sankoff_GPU {
     private:
         //host members
         sequences h_seq_ctx;
+        struct bp_prob *h_bp1, *h_bp2;
 
         //device_members
         float *dp_matrix;
         sequences *d_seq_ctx;
+        struct bp_prob *d_bp1, *d_bp2;
 };
 
 #ifdef __CUDACC__
