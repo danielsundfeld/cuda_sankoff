@@ -80,6 +80,8 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
         return;
 
     print_score_dep(i, j, k, l);
+    float s1_score = bp1->m[i][j];
+    float s2_score = bp2->m[k][l];
 
     /*
      * Explanations of this recursion functions can be see at:
@@ -97,10 +99,10 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
     score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
     score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
     score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
-    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + s1_score + Cost::gap * 2);
+    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + s2_score + Cost::gap * 2);
     score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
-            Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
+            s1_score + s2_score +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
     for (int m = i + 1; m < j; ++m)
