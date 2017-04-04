@@ -35,9 +35,10 @@ int get_bp_prob(const std::string &seq, vrna_md_t *md, struct bp_prob *bp)
         for (j = 1; j <= seq.length(); ++j)
         {
             f = get_prob_from_vc(vc, i, j);
+            //if (f)
             //printf("%d %d %1.9f %1.9f\n", i, j, f, sqrt(f));
-            printf("m[%d][%d] = %1.9f;\n", i, j, f);
-            bp->m[i][j] = f;
+            //printf("m[%d][%d] = %1.9f;\n", i, j, f);
+            bp->m[i][j] = sqrt(f);
         }
     }
     vrna_fold_compound_free(vc);
