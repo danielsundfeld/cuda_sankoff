@@ -23,7 +23,9 @@ Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
     get_bp_prob(seq1, h_bp1);
     get_bp_prob(seq2, h_bp2);
 
-    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(float)));
+    size_t dp_matrix_size = dp_matrix_calc_total_size(h_seq_ctx.s1_l, h_seq_ctx.s2_l) * sizeof(float);
+    check_gpu_code(cudaMalloc(&dp_matrix, dp_matrix_size));
+    check_gpu_code(cudaMemset(dp_matrix, 0, dp_matrix_size));
     check_gpu_code(cudaMalloc(&d_seq_ctx, sizeof(sequences)));
     check_gpu_code(cudaMemcpy(d_seq_ctx, &h_seq_ctx, sizeof(sequences), cudaMemcpyHostToDevice));
 
