@@ -113,7 +113,12 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
             score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
         } //n
     } //m
-    dp_matrix.put_pos(i, j, k, l, score);
+
+    //TODO val
+    dp_matrix_cell c;
+    c.score = score;
+    dp_matrix.put_pos(i, j, k, l, c);
+    //dp_matrix.put_pos(i, j, k, l, score);
 }
 
 void Sankoff::expand_inner_matrix(const int &i, const int &k)

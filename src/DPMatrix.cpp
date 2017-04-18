@@ -2,11 +2,13 @@
 
 #include <iostream>
 
+#include "dp_matrix_cell.h"
+
 DPMatrix::DPMatrix(const int &s1_l, const int &s2_l)
 : s1_l(s1_l),
   s2_l(s2_l)
 {
-    dp_matrix = new float[calc_total_size(s1_l, s2_l)]();
+    dp_matrix = new dp_matrix_cell[calc_total_size(s1_l, s2_l)]();
 }
 
 DPMatrix::~DPMatrix()
@@ -19,15 +21,16 @@ long long int DPMatrix::get_total_size() const
     return calc_total_size(s1_l, s2_l);
 }
 
+//TODO val
 float DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
 {
     if (check_border(i, j, k, l) == false)
         return -1024;
 
-    return dp_matrix[calc_delta(i, j, k, l)];
+    return dp_matrix[calc_delta(i, j, k, l)].score;
 }
 
-void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const float &val)
+void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const dp_matrix_cell &val)
 {
     if (check_border(i, j, k, l) == false)
         return;

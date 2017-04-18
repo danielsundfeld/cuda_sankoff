@@ -75,7 +75,13 @@ int Foldalign::fold_align()
                         } //n
                     } //m
                     if (score > 0)
-                        dp_matrix.put_pos(i, j, k, l, score);
+                    {
+                        //TODO val
+                        dp_matrix_cell c;
+                        c.score = score;
+                        dp_matrix.put_pos(i, j, k, l, c);
+                        //dp_matrix.put_pos(i, j, k, l, score);
+                    }
                 } //l
             } //j
         } //k
