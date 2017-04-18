@@ -1,5 +1,7 @@
 #ifndef _DPMATRIX_H
 #define _DPMATRIX_H
+#include "dp_matrix_cell.h"
+
 class DPMatrix {
     public:
         DPMatrix(const int &s1_l, const int &s2_l);

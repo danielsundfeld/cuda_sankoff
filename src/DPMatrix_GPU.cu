@@ -1,5 +1,7 @@
 #include "DPMatrix_GPU.h"
 
+#include "dp_matrix_cell.h"
+
 long long int dp_matrix_calc_total_size(long long int s1, long long int s2)
 {
     return (((1 + s1) * s1) / 2 ) * (((1 + s2) * s2) / 2);
@@ -21,24 +23,25 @@ __device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, sequenc
     return delta_i + delta_k + delta_mi;
 }
 
-__device__ __host__ float dp_matrix_get_pos(float *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
+//TODO return val
+__device__ __host__ float dp_matrix_get_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return -1024;
 
-    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)];
+    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)].score;
 }
 
-__device__ __host__ void dp_matrix_put_pos(float *dp_matrix, const int &i, const int &j, const int &k, const int &l, const float &val, sequences* seq_ctx)
+__device__ __host__ void dp_matrix_put_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, const dp_matrix_cell &val, sequences* seq_ctx)
 {
     dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)] = val;
 }
 
-__host__ float dp_matrix_get_val(float *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
+__host__ float dp_matrix_get_val(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return -1024;
-    float val = 0;
-    cudaMemcpy((void*)(&val), (void*)(&dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)]), sizeof(float), cudaMemcpyDeviceToHost);
-    return val;
+    dp_matrix_cell val = {};
+    cudaMemcpy((void*)(&val), (void*)(&dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)]), sizeof(dp_matrix_cell), cudaMemcpyDeviceToHost);
+    return val.score;
 }

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "bp_probs.h"
+#include "dp_matrix_cell.h"
 #include "DPMatrix_GPU.h"
 
 class Sankoff_GPU {
@@ -20,19 +21,19 @@ class Sankoff_GPU {
         struct bp_prob *h_bp1, *h_bp2;
 
         //device_members
-        float *dp_matrix;
+        dp_matrix_cell *dp_matrix;
         sequences *d_seq_ctx;
         struct bp_prob *d_bp1, *d_bp2;
 };
 
 #ifdef __CUDACC__
-__device__ void sankoff_gpu_expand_inner_matrix_diag(int *dp_matrix, const int &i, const int &k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
-__device__ void sankoff_gpu_expand_pos(int *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__device__ void sankoff_gpu_expand_inner_matrix_diag(dp_matrix_cell *dp_matrix, const int &i, const int &k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
 
-__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(int *dp_matrix, int outer_diag, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
-__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(int *dp_matrix, int outer_diag, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase1(dp_matrix_cell *dp_matrix, int outer_diag, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(dp_matrix_cell *dp_matrix, int outer_diag, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
 
-__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(int *dp_matrix, int outer_diag, int i, int k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
-__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(int *dp_matrix, int outer_diag, int i, int k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase1(dp_matrix_cell *dp_matrix, int outer_diag, int i, int k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
+__device__ void sankoff_gpu_expand_inner_matrix_diagonal_phase2(dp_matrix_cell *dp_matrix, int outer_diag, int i, int k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
 #endif
 #endif
