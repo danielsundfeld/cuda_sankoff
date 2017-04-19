@@ -12,6 +12,7 @@ class Sankoff {
         int sankoff(); //Run a pure sankoff algorithm
         int diag_sankoff(); //Run a pure sankoff algorithm
 
+        static void max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score);
         void print_score_dep(int i, int j, int k, int l) const;
         void print_mb_dep(int i, int j, int k, int l, int m, int n) const;
         void print_orig(int i, int j, int k, int l) const;

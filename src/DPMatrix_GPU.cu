@@ -23,13 +23,16 @@ __device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, sequenc
     return delta_i + delta_k + delta_mi;
 }
 
-//TODO return val
-__device__ __host__ float dp_matrix_get_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
+__device__ __host__ dp_matrix_cell dp_matrix_get_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx)
 {
     if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
-        return -1024;
+    {
+        dp_matrix_cell ret = dp_matrix_cell();
+        ret.score = -1024;
+        return ret;
+    }
 
-    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)].score;
+    return dp_matrix[dp_matrix_calc_delta(i, j, k, l, seq_ctx)];
 }
 
 __device__ __host__ void dp_matrix_put_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, const dp_matrix_cell &val, sequences* seq_ctx)

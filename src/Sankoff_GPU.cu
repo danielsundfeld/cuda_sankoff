@@ -54,10 +54,17 @@ void Sankoff_GPU::check_gpu_code(cudaError_t code)
     }
 }
 
+__device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score)
+{
+    score2.score += extra_score;
+    if (score2.score > score1.score)
+        score1 = score2;
+}
+
 //! Expand one cell with position \a i, \a j, \a k, \a l
 __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2)
 {
-    float score = 0;
+    dp_matrix_cell score = dp_matrix_cell();
     const char* const &s1 = seq_ctx->s1;
     const char* const &s2 = seq_ctx->s2;
 
@@ -67,31 +74,29 @@ __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, 
     float s1_score = bp1->m[i][j];
     float s2_score = bp2->m[k][l];
 
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx) + Cost::gap);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, seq_ctx) + Cost::gap);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, seq_ctx) + Cost::gap);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, seq_ctx) + Cost::gap);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, seq_ctx) + Cost::match_score(s1[i], s2[k]));
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, seq_ctx) + Cost::match_score(s1[j], s2[l]));
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, seq_ctx) + s1_score + Cost::gap * 2);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, seq_ctx) + s2_score + Cost::gap * 2);
-    score = MAX(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, seq_ctx) +
-            s1_score + s2_score +
+    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx), Cost::gap);
+    max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, seq_ctx), Cost::gap);
+    max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, seq_ctx), Cost::gap);
+    max(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, seq_ctx), Cost::gap);
+    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, seq_ctx), Cost::match_score(s1[i], s2[k]));
+    max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, seq_ctx), Cost::match_score(s1[j], s2[l]));
+    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, seq_ctx), s1_score + Cost::gap * 2);
+    max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, seq_ctx), s2_score + Cost::gap * 2);
+    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, seq_ctx), s1_score + s2_score +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
     for (int m = i + 1; m < j; ++m)
     {
         for (int n = k + 1; n < l; ++n)
         {
-            score = MAX(score, dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx) + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx));
+            dp_matrix_cell temp = dp_matrix_cell();
+
+            temp.score = dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx).score + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx).score;
+            max(score, temp, 0);
         } //n
     } //m
 
-    //TODO val
-    dp_matrix_cell c;
-    c.score = score;
-    dp_matrix_put_pos(dp_matrix, i, j, k, l, c, seq_ctx);
-    //dp_matrix_put_pos(dp_matrix, i, j, k, l, score, seq_ctx);
+    dp_matrix_put_pos(dp_matrix, i, j, k, l, score, seq_ctx);
 }
 
 //! Expand inner matrix, first wave, from the begin to the main diagonal

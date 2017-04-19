@@ -14,7 +14,7 @@ struct sequences {
 long long int dp_matrix_calc_total_size(long long int s1, long long int s2);
 #ifdef __CUDACC__
 __device__ __host__ int dp_matrix_calc_delta(int i, int j, int k, int l, sequences* seq_ctx);
-__device__ __host__ float dp_matrix_get_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx);
+__device__ __host__ dp_matrix_cell dp_matrix_get_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx);
 __device__ __host__ void dp_matrix_put_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, const float &val, sequences* seq_ctx);
 __host__ float dp_matrix_get_val(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx);
 

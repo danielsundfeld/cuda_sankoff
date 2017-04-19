@@ -21,13 +21,16 @@ long long int DPMatrix::get_total_size() const
     return calc_total_size(s1_l, s2_l);
 }
 
-//TODO val
-float DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
+dp_matrix_cell DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
 {
     if (check_border(i, j, k, l) == false)
-        return -1024;
+    {
+        dp_matrix_cell ret = dp_matrix_cell();
+        ret.score = -1024;
+        return ret;
+    }
 
-    return dp_matrix[calc_delta(i, j, k, l)].score;
+    return dp_matrix[calc_delta(i, j, k, l)];
 }
 
 void DPMatrix::put_pos(const int &i, const int &j, const int &k, const int &l, const dp_matrix_cell &val)

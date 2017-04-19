@@ -40,19 +40,19 @@ int Foldalign::fold_align()
 
                 for (int l = l_begin; l < l_end; ++l)
                 {
-                    float score = 0;
+                    dp_matrix_cell score = dp_matrix_cell();
 
                     print_score_dep(i, j, k, l);
 
-                    score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
-                    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
-                    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
-                    score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
-                    score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
-                    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
-                    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
-                    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k, l), Cost::gap);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap);
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]));
+                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]));
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1),
                                                         Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
                                                         Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
@@ -70,22 +70,21 @@ int Foldalign::fold_align()
 
                         for (int n = n_begin; n < n_end; ++n)
                         {
+                            dp_matrix_cell temp;
+
                             print_mb_dep(i, j, k, l, m, n);
-                            score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
+                            temp.score = dp_matrix.get_pos(i, m, k, n).score + dp_matrix.get_pos(m + 1, j, n + 1, l).score;
+                            Sankoff::max(score, temp, 0);
                         } //n
                     } //m
-                    if (score > 0)
+                    if (score.score > 0)
                     {
-                        //TODO val
-                        dp_matrix_cell c;
-                        c.score = score;
-                        dp_matrix.put_pos(i, j, k, l, c);
-                        //dp_matrix.put_pos(i, j, k, l, score);
+                        dp_matrix.put_pos(i, j, k, l, score);
                     }
                 } //l
             } //j
         } //k
     } //i
-    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1).score << std::endl;
     return 0;
 }

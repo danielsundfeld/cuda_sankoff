@@ -72,9 +72,16 @@ void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
 }
 
+void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score)
+{
+    score2.score += extra_score;
+    if (score2.score > score1.score)
+        score1 = score2;
+}
+
 void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 {
-    float score = 0;
+    dp_matrix_cell score = dp_matrix_cell();
 
     if (dp_matrix.check_border(i, j, k, l) == false)
         return;
@@ -93,32 +100,30 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
      * - Torarinsson, et al. "Multiple structural alignment and clustering of RNA sequences
      * - Ziv-Ukelson, et al. "A faster algorithm for RNA co-folding"
     */
-    score = std::max(score, dp_matrix.get_pos(i + 1, j, k, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i, j, k, l - 1) + Cost::gap);
-    score = std::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l) + Cost::match_score(s1[i], s2[k]));
-    score = std::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1) + Cost::match_score(s1[j], s2[l]));
-    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l) + s1_score + Cost::gap * 2);
-    score = std::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1) + s2_score + Cost::gap * 2);
-    score = std::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1) +
-            s1_score + s2_score +
+    max(score, dp_matrix.get_pos(i + 1, j, k, l), Cost::gap);
+    max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap);
+    max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap);
+    max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap);
+    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]));
+    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]));
+    max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), s1_score + Cost::gap * 2);
+    max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), s2_score + Cost::gap * 2);
+    max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1), s1_score + s2_score +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
 
     for (int m = i + 1; m < j; ++m)
     {
         for (int n = k + 1; n < l; ++n)
         {
+            dp_matrix_cell temp;
+
             print_mb_dep(i, j, k, l, m, n);
-            score = std::max(score, dp_matrix.get_pos(i, m, k, n) + dp_matrix.get_pos(m + 1, j, n + 1, l));
+            temp.score = dp_matrix.get_pos(i, m, k, n).score + dp_matrix.get_pos(m + 1, j, n + 1, l).score;
+            max(score, temp, 0);
         } //n
     } //m
 
-    //TODO val
-    dp_matrix_cell c;
-    c.score = score;
-    dp_matrix.put_pos(i, j, k, l, c);
-    //dp_matrix.put_pos(i, j, k, l, score);
+    dp_matrix.put_pos(i, j, k, l, score);
 }
 
 void Sankoff::expand_inner_matrix(const int &i, const int &k)
@@ -171,7 +176,7 @@ int Sankoff::sankoff()
             expand_inner_matrix(i, k);
         } //k
     } //i
-    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1).score << std::endl;
     return 0;
 }
 
@@ -201,6 +206,6 @@ int Sankoff::diag_sankoff()
                 expand_inner_matrix_diag(i, k);
         }
     } //outer_diag
-    std::cout << "Score: " << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1) << std::endl;
+    std::cout << "Score: " << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1).score << std::endl;
     return 0;
 }
