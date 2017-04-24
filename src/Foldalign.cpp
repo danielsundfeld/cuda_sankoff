@@ -44,17 +44,17 @@ int Foldalign::fold_align()
 
                     print_score_dep(i, j, k, l);
 
-                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k, l), Cost::gap);
-                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap);
-                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap);
-                    Sankoff::max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap);
-                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]));
-                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]));
-                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), Cost::base_score(s1[i], s1[j]) + Cost::gap * 2);
-                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), Cost::base_score(s2[k], s2[l]) + Cost::gap * 2);
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k, l), Cost::gap, GapI);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap, GapK);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap, GapJ);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap, GapL);
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]), UnpairedIK);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]), UnpairedJL);
+                    Sankoff::max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), Cost::base_score(s1[i], s1[j]) + Cost::gap * 2, PairedGapS1);
+                    Sankoff::max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), Cost::base_score(s2[k], s2[l]) + Cost::gap * 2, PairedGapS2);
                     Sankoff::max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1),
                                                         Cost::base_score(s1[i], s1[j]) + Cost::base_score(s2[k], s2[l]) +
-                                                        Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]));
+                                                        Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]), Paired);
 
                     int m_end = i + 1 + lambda;
                     if (m_end > j)
@@ -74,7 +74,7 @@ int Foldalign::fold_align()
 
                             print_mb_dep(i, j, k, l, m, n);
                             temp.score = dp_matrix.get_pos(i, m, k, n).score + dp_matrix.get_pos(m + 1, j, n + 1, l).score;
-                            Sankoff::max(score, temp, 0);
+                            Sankoff::max(score, temp, 0, Multibranch);
                         } //n
                     } //m
                     if (score.score > 0)
