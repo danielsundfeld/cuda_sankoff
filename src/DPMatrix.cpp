@@ -21,7 +21,7 @@ long long int DPMatrix::get_total_size() const
     return calc_total_size(s1_l, s2_l);
 }
 
-dp_matrix_cell DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l)
+dp_matrix_cell DPMatrix::get_pos(const int &i, const int &j, const int &k, const int &l) const
 {
     if (check_border(i, j, k, l) == false)
     {

@@ -6,7 +6,7 @@ class DPMatrix {
     public:
         DPMatrix(const int &s1_l, const int &s2_l);
         ~DPMatrix();
-        dp_matrix_cell get_pos(const int &i, const int &j, const int &k, const int &l);
+        dp_matrix_cell get_pos(const int &i, const int &j, const int &k, const int &l) const;
         void put_pos(const int &i, const int &j, const int &k, const int &l, const dp_matrix_cell &val);
         long long int get_total_size() const;
         bool check_border(const int &i, const int &j, const int &k, const int &l) const;
