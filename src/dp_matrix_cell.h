@@ -6,7 +6,8 @@ struct dp_matrix_cell {
 };
 
 enum Parent {
-    GapI = 0,
+    NullParent = 0,
+    GapI,
     GapK,
     GapJ,
     GapL,

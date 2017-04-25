@@ -210,5 +210,7 @@ int Sankoff::diag_sankoff()
         }
     } //outer_diag
     std::cout << "Score: " << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1).score << std::endl;
+    //dp_matrix.backtrace("1234567890123456789", "1234567890123456789");
+    dp_matrix.backtrace(s1, s2);
     return 0;
 }
