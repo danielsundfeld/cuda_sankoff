@@ -177,10 +177,10 @@ void DPMatrix::backtrace(const std::string &s1, const std::string &s2)
 
     while (check_border(i, j, k, l) && c.parent != NullParent)
     {
-        printf("%f (%d) - %d %d %d %d\n", c.score, c.parent, i, k, j, l);
+        printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
         c = get_parent(c, i, j, k, l, s1, s2);
     }
-    printf("%f (%d) - %d %d %d %d\n", c.score, c.parent, i, k, j, l);
+    printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
 
     print_list(list_i);
     print_list(list_j);

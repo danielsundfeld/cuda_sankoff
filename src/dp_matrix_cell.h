@@ -7,6 +7,7 @@ struct dp_matrix_cell {
 
 enum Parent {
     NullParent = 0,
+    FirstCell,
     GapI,
     GapK,
     GapJ,
@@ -18,5 +19,21 @@ enum Parent {
     Paired,
     Multibranch,
     LastParent
+};
+
+const char parent_str[][LastParent] = {
+    "NullParent",
+    "FirstCell",
+    "GapI",
+    "GapK",
+    "GapJ",
+    "GapL",
+    "UnpairedIK",
+    "UnpairedJL",
+    "PairedGapS1",
+    "PairedGapS2",
+    "Paired",
+    "Multibranch",
+    "LastParent"
 };
 #endif
