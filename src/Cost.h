@@ -8,14 +8,12 @@
 
 class Cost {
     public:
-        enum {
-            gap = 0,
-            mismatch = 0,
-            match = 0,
+        static const float gap = -0.4;
+        static const float mismatch = -0.3;
+        static const float match = 0.3;
+        static const float base_paired = 0.3;
+        static const float unpaired = -0.2;
 
-            base_paired = 0,
-            unpaired = 0,
-        };
         CUDAFLAGS static int base_score(const char &a, const char &b); //'alpha' score
         CUDAFLAGS static int match_score(const char &a, const char &b); // 'beta' score
         CUDAFLAGS static int compensation_score(const char &a1, const char &a2, const char &b1, const char &b2); // 'tau' score
