@@ -90,8 +90,8 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
         return;
 
     print_score_dep(i, j, k, l);
-    float s1_score = bp1->m[i][j];
-    float s2_score = bp2->m[k][l];
+    float s1_score = bp1->m[i+1][j+1];
+    float s2_score = bp2->m[k+1][l+1];
 
     /*
      * Explanations of this recursion functions can be see at:

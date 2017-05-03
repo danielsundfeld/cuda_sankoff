@@ -74,8 +74,8 @@ __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, 
     if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
         return;
 
-    float s1_score = bp1->m[i][j];
-    float s2_score = bp2->m[k][l];
+    float s1_score = bp1->m[i+1][j+1];
+    float s2_score = bp2->m[k+1][l+1];
 
     max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx), Cost::gap, GapI);
     max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, seq_ctx), Cost::gap, GapK);
