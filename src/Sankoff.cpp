@@ -1,6 +1,7 @@
 #include "Sankoff.h"
 
 #include <iostream>
+#include <stdio.h>
 
 #include "bp_probs.h"
 #include "Cost.h"
@@ -27,12 +28,17 @@ Sankoff::~Sankoff()
 
 void Sankoff::print_orig(int i, int j, int k, int l) const
 {
-    std::cout << i << " " << j << " " << k << " "  << l << ":";
+    std::cout << i << " " << k << " " << j << " "  << l << ":";
 }
 
 void Sankoff::print_index(int i, int j, int k, int l) const
 {
-    std::cout << "\t" << i << " " << j << " " << k << " "  << l << "\n";
+    if (dp_matrix.check_border(i,j,k,l))
+    {
+        std::cout << "\t" << i << " " << k << " " << j << " "  << l << " " <<
+        dp_matrix.get_pos(i, j, k, l).score;
+    }
+    std::cout << "\n";
 }
 
 // To visualize the data dependecy...
@@ -40,25 +46,34 @@ void Sankoff::print_score_dep(int i, int j, int k, int l) const
 {
     return;
     print_orig(i, j, k, l);
+    std::cout << " (GapI) ";
     print_index(i + 1, j, k, l);
     print_orig(i, j, k, l);
+    std::cout << " (GapK) ";
     print_index(i, j, k + 1, l);
     print_orig(i, j, k, l);
+    std::cout << " (GapJ) ";
     print_index(i, j - 1, k, l);
     print_orig(i, j, k, l);
+    std::cout << " (GapL) ";
     print_index(i, j, k, l - 1);
 
     print_orig(i, j, k, l);
+    std::cout << " (UnpairedIK) ";
     print_index(i + 1, j, k + 1, l);
     print_orig(i, j, k, l);
+    std::cout << " (UnpairedJL) ";
     print_index(i, j - 1, k, l - 1);
 
     print_orig(i, j, k, l);
+    std::cout << " (Paired GapS1) ";
     print_index(i + 1, j - 1, k, l);
     print_orig(i, j, k, l);
+    std::cout << " (Paired GapS2) ";
     print_index(i, j, k + 1, l - 1);
 
     print_orig(i, j, k, l);
+    std::cout << " (Paired) ";
     print_index(i + 1, j - 1 , k + 1, l - 1);
 }
 
@@ -75,7 +90,7 @@ void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score, int parent)
 {
     score2.score += extra_score;
-    if (score2.score > score1.score)
+    if (score2.score > score1.score || (score1.parent == NullParent && score2.parent != NullParent))
     {
         score1.score = score2.score;
         score1.parent = parent;
@@ -90,8 +105,8 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
         return;
 
     print_score_dep(i, j, k, l);
-    float s1_score = bp1->m[i+1][j+1];
-    float s2_score = bp2->m[k+1][l+1];
+    float s1_score = Cost::base_score(s1[i], s1[j]) ? bp1->m[i+1][j+1] : -1024;
+    float s2_score = Cost::base_score(s2[k], s2[l]) ? bp2->m[k+1][l+1] : -1024;
 
     /*
      * Explanations of this recursion functions can be see at:
@@ -107,8 +122,8 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
     max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap, GapK);
     max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap, GapJ);
     max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap, GapL);
-    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]), UnpairedIK);
-    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]), UnpairedJL);
+    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]) + Cost::unpaired, UnpairedIK);
+    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]) + Cost::unpaired, UnpairedJL);
     max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), s1_score + Cost::gap * 2, PairedGapS1);
     max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), s2_score + Cost::gap * 2, PairedGapS2);
     max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1), s1_score + s2_score +
@@ -122,10 +137,12 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
 
             print_mb_dep(i, j, k, l, m, n);
             temp.score = dp_matrix.get_pos(i, m, k, n).score + dp_matrix.get_pos(m + 1, j, n + 1, l).score;
+            temp.parent = Multibranch;
             max(score, temp, 0, Multibranch);
         } //n
     } //m
 
+    //printf("%f (%s) %d %d %d %d\n", score.score, parent_str[(int)score.parent], i, k, j, l);
     dp_matrix.put_pos(i, j, k, l, score);
 }
 

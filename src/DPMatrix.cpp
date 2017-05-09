@@ -160,6 +160,16 @@ dp_matrix_cell DPMatrix::get_parent(const dp_matrix_cell c, int &i, int &j, int 
     return get_pos(i, j, k, l);
 }
 
+void DPMatrix::add_last(const dp_matrix_cell c, int &i, int &k, const std::string &s1, const std::string &s2)
+{
+    if (c.parent != NullParent)
+        return;
+
+    list_i.push_back(s1[i]);
+    list_k.push_back(s2[k]);
+    list_bp_left.push_back('.');
+}
+
 void print_list(const std::list<char> &list)
 {
     for (std::list<char>::const_iterator it = list.begin(); it != list.end(); ++it)
@@ -180,7 +190,8 @@ void DPMatrix::backtrace(const std::string &s1, const std::string &s2)
         printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
         c = get_parent(c, i, j, k, l, s1, s2);
     }
-    printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
+    add_last(c, i, k, s1, s2);
+    printf("Fim: %f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
 
     print_list(list_i);
     print_list(list_j);

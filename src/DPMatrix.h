@@ -19,6 +19,7 @@ class DPMatrix {
         int calc_delta(int i, int j, int k, int l) const;
         long long int calc_total_size(long long int s1, long long int s2) const;
         dp_matrix_cell get_parent(const dp_matrix_cell c, int &i, int &j, int &k, int &l, const std::string &s1, const std::string &s2);
+        void add_last(const dp_matrix_cell c, int &i, int &k, const std::string &s1, const std::string &s2);
 
         dp_matrix_cell *dp_matrix;
         const int s1_l;
