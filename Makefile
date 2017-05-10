@@ -47,6 +47,8 @@ ifdef PROFILE_INFORMATION
 endif
 
 COMMON_SRCS += \
+    $(SRC_DIR)/Backtrace.cpp \
+    $(SRC_DIR)/DPMatrix.cpp \
     $(SRC_DIR)/read_fasta.cpp \
     $(SRC_DIR)/sankoff_args.cpp \
     $(SRC_DIR)/Sequences.cpp \
@@ -54,7 +56,6 @@ COMMON_SRCS += \
 
 CPU_SANK_SRCS += \
     $(SRC_DIR)/sankoff_cpu_main.cpp \
-    $(SRC_DIR)/DPMatrix.cpp \
     $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Sankoff.cpp \
 

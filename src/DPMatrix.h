@@ -1,8 +1,8 @@
 #ifndef _DPMATRIX_H
 #define _DPMATRIX_H
-#include <list>
 #include <string>
 
+#include "Backtrace.h"
 #include "dp_matrix_cell.h"
 
 class DPMatrix {
@@ -24,6 +24,5 @@ class DPMatrix {
         dp_matrix_cell *dp_matrix;
         const int s1_l;
         const int s2_l;
-        std::list<char> list_i, list_j, list_k, list_l, list_bp_left, list_bp_right;
 };
 #endif
