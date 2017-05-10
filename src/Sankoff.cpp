@@ -133,12 +133,16 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
     {
         for (int n = k + 1; n < l; ++n)
         {
-            dp_matrix_cell temp;
-
             print_mb_dep(i, j, k, l, m, n);
-            temp.score = dp_matrix.get_pos(i, m, k, n).score + dp_matrix.get_pos(m + 1, j, n + 1, l).score;
-            temp.parent = Multibranch;
-            max(score, temp, 0, Multibranch);
+
+            dp_matrix_cell mb_right = dp_matrix.get_pos(m + 1, j, n + 1, l);
+            if (mb_right.parent != Paired)
+                continue;
+
+            dp_matrix_cell mb_left;
+            mb_left.score = dp_matrix.get_pos(i, m, k, n).score + mb_right.score;
+            mb_left.parent = Multibranch;
+            max(score, mb_left, 0, Multibranch);
         } //n
     } //m
 

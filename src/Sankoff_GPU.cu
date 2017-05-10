@@ -92,10 +92,14 @@ __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, 
     {
         for (int n = k + 1; n < l; ++n)
         {
-            dp_matrix_cell temp;
+            dp_matrix_cell mb_right = dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx);
+            if (mb_right.parent != Paired)
+                continue;
 
-            temp.score = dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx).score + dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx).score;
-            max(score, temp, 0, Multibranch);
+            dp_matrix_cell mb_left;
+            mb_left.score = dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx).score + mb_right.score;
+            mb_left.parent = Multibranch;
+            max(score, mb_left, 0, Multibranch);
         } //n
     } //m
 
