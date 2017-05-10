@@ -19,6 +19,7 @@ Backtrace::Backtrace(DPMatrix *dp_matrix, int i, int j, int k, int l, const std:
 
 dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
 {
+    //small reminder: insert(0, 1, c) is push_front: insert at position 0, one char 'c'
     switch (c.parent)
     {
         case GapI:
@@ -36,16 +37,16 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
             break;
 
         case GapJ:
-            list_j.push_front(s1[j]);
-            list_bp_right.push_front('.');
-            list_l.push_front('-');
+            list_j.insert(0, 1, s1[j]);
+            list_bp_right.insert(0, 1, '.');
+            list_l.insert(0, 1, '-');
             j -= 1;
             break;
 
         case GapL:
-            list_l.push_front(s2[l]);
-            list_bp_right.push_front('.');
-            list_j.push_front('-');
+            list_l.insert(0, 1, s2[l]);
+            list_bp_right.insert(0, 1, '.');
+            list_j.insert(0, 1, '-');
             l -= 1;
             break;
 
@@ -58,42 +59,42 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
             break;
 
         case UnpairedJL:
-            list_j.push_front(s1[j]);
-            list_bp_right.push_front('.');
-            list_l.push_front(s2[l]);
+            list_j.insert(0, 1, s1[j]);
+            list_bp_right.insert(0, 1, '.');
+            list_l.insert(0, 1, s2[l]);
             j -= 1;
             l -= 1;
             break;
 
         case PairedGapS1:
             list_i.push_back(s1[i]);
-            list_j.push_front(s1[j]);
+            list_j.insert(0, 1, s1[j]);
             list_bp_left.push_back('(');
-            list_bp_right.push_front(')');
+            list_bp_right.insert(0, 1, ')');
             list_k.push_back('-');
-            list_l.push_front('-');
+            list_l.insert(0, 1, '-');
             i += 1;
             j -= 1;
             break;
 
         case PairedGapS2:
             list_k.push_back(s2[k]);
-            list_l.push_front(s2[l]);
+            list_l.insert(0, 1, s2[l]);
             list_bp_left.push_back('(');
-            list_bp_right.push_front(')');
+            list_bp_right.insert(0, 1, ')');
             list_i.push_back('-');
-            list_j.push_front('-');
+            list_j.insert(0, 1, '-');
             k += 1;
             l -= 1;
             break;
 
         case Paired:
             list_i.push_back(s1[i]);
-            list_j.push_front(s1[j]);
+            list_j.insert(0, 1, s1[j]);
             list_bp_left.push_back('(');
-            list_bp_right.push_front(')');
+            list_bp_right.insert(0, 1, ')');
             list_k.push_back(s2[k]);
-            list_l.push_front(s2[l]);
+            list_l.insert(0, 1, s2[l]);
             i += 1;
             j -= 1;
             k += 1;
@@ -118,10 +119,9 @@ void Backtrace::add_last(const dp_matrix_cell c)
     list_bp_left.push_back('.');
 }
 
-void print_list(const std::list<char> &list, std::string &st)
+void print_list(const std::string &list, std::string &st)
 {
-    for (std::list<char>::const_iterator it = list.begin(); it != list.end(); ++it)
-        st.push_back(*it);
+    st.append(list);
 }
 
 void Backtrace::run()

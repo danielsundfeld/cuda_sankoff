@@ -1,6 +1,5 @@
 #ifndef _BACKTRACE_H
 #define _BACKTRACE_H
-#include <list>
 #include <string>
 
 #include "DPMatrix.h"
@@ -12,7 +11,7 @@ class Backtrace {
     public:
         Backtrace(DPMatrix *dp_matrix, int i, int j, int k, int l, const std::string &s1, const std::string &s2);
         void run();
-        void print(std::string &align_ments1, std::string &alignment_structure, std::string &alignment_s2);
+        void print(std::string &alignment_s1, std::string &alignment_structure, std::string &alignment_s2);
 
     private:
         void add_last(const dp_matrix_cell c);
@@ -21,6 +20,6 @@ class Backtrace {
         DPMatrix *dp_matrix;
         int i, j, k, l;
         const std::string s1, s2;
-        std::list<char> list_i, list_j, list_k, list_l, list_bp_left, list_bp_right;
+        std::string list_i, list_j, list_k, list_l, list_bp_left, list_bp_right;
 };
 #endif
