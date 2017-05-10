@@ -76,6 +76,9 @@ bool DPMatrix::check_border(const int &i, const int &j, const int &k, const int 
 
 void DPMatrix::backtrace(const std::string &s1, const std::string &s2)
 {
+    std::string alignment_s1, alignment_structure, alignment_s2;
     Backtrace bc(this, 0, s1_l - 1, 0, s2_l - 1, s1, s2);
     bc.run();
+    bc.print(alignment_s1, alignment_structure, alignment_s2);
+    std::cout << alignment_s1 << "\n" << alignment_structure << "\n" << alignment_s2 << "\n";
 }

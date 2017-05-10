@@ -12,6 +12,7 @@ class Backtrace {
     public:
         Backtrace(DPMatrix *dp_matrix, int i, int j, int k, int l, const std::string &s1, const std::string &s2);
         void run();
+        void print(std::string &align_ments1, std::string &alignment_structure, std::string &alignment_s2);
 
     private:
         void add_last(const dp_matrix_cell c);
