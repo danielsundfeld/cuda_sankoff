@@ -16,6 +16,7 @@ class Sankoff_GPU {
         int diag_sankoff(); //Run a pure sankoff algorithm
 
     private:
+        void backtrace();
         //host members
         sequences h_seq_ctx;
         struct bp_prob *h_bp1, *h_bp2;

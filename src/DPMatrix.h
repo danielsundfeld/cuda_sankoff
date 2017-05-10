@@ -14,6 +14,7 @@ class DPMatrix {
         long long int get_total_size() const;
         bool check_border(const int &i, const int &j, const int &k, const int &l) const;
         void backtrace(const std::string &s1, const std::string &s2);
+        dp_matrix_cell* get_dp_matrix() { return dp_matrix; };
 
     private:
         int calc_delta(int i, int j, int k, int l) const;

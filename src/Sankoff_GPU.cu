@@ -6,6 +6,7 @@
 #include "bp_probs.h"
 #include "Cost.h"
 #include "dp_matrix_cell.h"
+#include "DPMatrix.h"
 #include "DPMatrix_GPU.cu"
 
 #define MAX(x, y) x > y ? x : y
@@ -50,6 +51,16 @@ void Sankoff_GPU::check_gpu_code(cudaError_t code)
     if (code != cudaSuccess)
     {
         std::cerr << "Fatal error: " << cudaGetErrorString(code) << std::endl;
+        exit(1);
+    }
+}
+
+void copy_dp_matrix_from_gpu(dp_matrix_cell *h_dp_matrix, dp_matrix_cell *d_dp_matrix, long long int size)
+{
+    cudaError_t code = cudaMemcpy(h_dp_matrix, d_dp_matrix, sizeof(dp_matrix_cell) * size, cudaMemcpyDeviceToHost);
+    if (code != cudaSuccess)
+    {
+        std::cerr << "Fatal error copying the dp_matrix from gpu: " << cudaGetErrorString(code) << std::endl;
         exit(1);
     }
 }
@@ -182,6 +193,13 @@ __global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(dp_matrix_cell *
     return;
 }
 
+void Sankoff_GPU::backtrace()
+{
+    DPMatrix h_dp_matrix(h_seq_ctx.s1_l, h_seq_ctx.s2_l);
+    copy_dp_matrix_from_gpu(h_dp_matrix.get_dp_matrix(), dp_matrix, h_dp_matrix.get_total_size());
+    h_dp_matrix.backtrace(h_seq_ctx.s1, h_seq_ctx.s2);
+}
+
 //! Runs Sankoff in a Diagonal way
 int Sankoff_GPU::diag_sankoff()
 {
@@ -207,5 +225,7 @@ int Sankoff_GPU::diag_sankoff()
         sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx, d_bp1, d_bp2);
     } //outer_diag
     std::cout << "Score: " << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, &h_seq_ctx) << std::endl;
+
+    backtrace();
     return 0;
 }
