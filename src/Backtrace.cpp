@@ -100,11 +100,6 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
             k += 1;
             l -= 1;
             break;
-
-        case Multibranch:
-            std::cout << "MULTIBRANCH\n";
-            //exit(1);
-            break;
     }
     return dp_matrix->get_pos(i, j, k, l);
 }
@@ -124,18 +119,55 @@ void print_list(const std::string &list, std::string &st)
     st.append(list);
 }
 
+void Backtrace::calculate_mb_position(float score)
+{
+    for (m = i + 1; m < j; ++m)
+    {
+        for (n = k + 1; n < l; ++n)
+        {
+            dp_matrix_cell mb_right = dp_matrix->get_pos(m + 1, j, n + 1, l);
+            if (mb_right.parent != Paired)
+                continue;
+
+            if (dp_matrix->get_pos(i, m, k, n).score + mb_right.score == score)
+                return;
+        } //n
+    } //m
+}
+
+void Backtrace::do_backtrace_mb(int i, int j, int k, int l)
+{
+    std::string temp_s1, temp_structure, temp_s2;
+    Backtrace *mb_bc = new Backtrace(dp_matrix, i, j, k, l, s1, s2);
+    mb_bc->run();
+    mb_bc->print(temp_s1, temp_structure, temp_s2);
+
+    list_i.insert(0, temp_s1);
+    list_bp_left.insert(0, temp_structure);
+    list_k.insert(0, temp_s2);
+    delete mb_bc;
+}
+
 void Backtrace::run()
 {
     dp_matrix_cell c = dp_matrix->get_pos(i, j, k, l);
-    while (dp_matrix->check_border(i, j, k, l) && c.parent != NullParent)
+    while (dp_matrix->check_border(i, j, k, l) && c.parent != NullParent && c.parent != Multibranch)
     {
-        if (c.parent == Multibranch)
-            return;
-        printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
+        //printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
         c = get_parent(c);
     }
-    add_last(c);
-    printf("Fim: %f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
+    if (c.parent == Multibranch)
+    {
+        calculate_mb_position(c.score);
+        //printf("(%d %d %d %d) = (%d %d %d %d) + (%d %d %d %d)\n", i, j, k, l, i, m, k, n, m + 1, j, n + 1, l);
+
+        do_backtrace_mb(m + 1, j, n + 1, l);
+        do_backtrace_mb(i, m, k, n);
+        return;
+    }
+    else
+        add_last(c);
+    //printf("Fim: %f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
 }
 
 void Backtrace::print(std::string &alignment_s1, std::string &alignment_structure, std::string &alignment_s2)
