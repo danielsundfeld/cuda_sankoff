@@ -8,6 +8,7 @@
 #include "dp_matrix_cell.h"
 #include "DPMatrix.h"
 #include "DPMatrix_GPU.cu"
+#include "TimeCounter.h"
 
 #define MAX(x, y) x > y ? x : y
 Sankoff_GPU::Sankoff_GPU(const std::string &seq1, const std::string &seq2)
@@ -195,8 +196,13 @@ __global__ void sankoff_gpu_expand_outer_matrix_diagonal_phase2(dp_matrix_cell *
 
 void Sankoff_GPU::backtrace()
 {
+    TimeCounter tb("Backtrace total time");
+    TimeCounter *t2 = new TimeCounter("Initializing CPU memory");
     DPMatrix h_dp_matrix(h_seq_ctx.s1_l, h_seq_ctx.s2_l);
+    delete t2;
+    TimeCounter *t1 = new TimeCounter("Copy from GPU");
     copy_dp_matrix_from_gpu(h_dp_matrix.get_dp_matrix(), dp_matrix, h_dp_matrix.get_total_size());
+    delete t1;
     h_dp_matrix.backtrace(h_seq_ctx.s1, h_seq_ctx.s2);
 }
 

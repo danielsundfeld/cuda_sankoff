@@ -45,5 +45,5 @@ TimeCounter::~TimeCounter()
 
     gettimeofday(&end, NULL);
     timeval_subtract(&result, &end, &m_begin);
-    printf("%ld:%02ld.%06ld\n", result.tv_sec / 60, result.tv_sec % 60, result.tv_usec);
+    printf("%s: %ld:%02ld.%06ld\n", m_msg.c_str(), result.tv_sec / 60, result.tv_sec % 60, result.tv_usec);
 }

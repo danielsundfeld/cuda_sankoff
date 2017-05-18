@@ -52,6 +52,7 @@ COMMON_SRCS += \
     $(SRC_DIR)/read_fasta.cpp \
     $(SRC_DIR)/sankoff_args.cpp \
     $(SRC_DIR)/Sequences.cpp \
+    $(SRC_DIR)/TimeCounter.cpp \
     $(SRC_DIR)/bp_probs.cpp \
 
 CPU_SANK_SRCS += \
