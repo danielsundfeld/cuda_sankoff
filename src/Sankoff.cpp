@@ -5,6 +5,7 @@
 
 #include "bp_probs.h"
 #include "Cost.h"
+#include "TimeCounter.h"
 
 Sankoff::Sankoff(const std::string &seq1, const std::string &seq2)
 : dp_matrix(seq1.length(), seq2.length())
@@ -232,6 +233,7 @@ int Sankoff::diag_sankoff()
     } //outer_diag
     std::cout << "Score: " << dp_matrix.get_pos(0, s1_l - 1, 0, s2_l - 1).score << std::endl;
     //dp_matrix.backtrace("1234567890123456789", "1234567890123456789");
+    TimeCounter tb("Backtrace total time");
     dp_matrix.backtrace(s1, s2);
     return 0;
 }
