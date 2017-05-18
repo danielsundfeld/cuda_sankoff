@@ -27,11 +27,11 @@ CUDAFLAGS inline int Cost::base_score(const char &a, const char &b)
     return 0;
 }
 
+//Only for unpaired
 CUDAFLAGS inline float Cost::match_score(const char &a, const char &b)
 {
     if (a == b)
-        //TODO: FIXME
-        return 0;
+        return Cost::unpaired;
     return 0;
 }
 

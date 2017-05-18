@@ -122,8 +122,8 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
     max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap, GapK);
     max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap, GapJ);
     max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap, GapL);
-    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]) + Cost::unpaired, UnpairedIK);
-    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]) + Cost::unpaired, UnpairedJL);
+    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]), UnpairedIK);
+    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]), UnpairedJL);
     max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), s1_score + Cost::gap * 2, PairedGapS1);
     max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), s2_score + Cost::gap * 2, PairedGapS2);
     max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1), s1_score + s2_score +
