@@ -8,11 +8,8 @@
 
 class Cost {
     public:
-        static const float gap = -0.4;
-        static const float mismatch = -0.3;
-        static const float match = 0.3;
-        static const float base_paired = 0.3;
-        static const float unpaired = 0.1;
+        static const float gap = -3;
+        static const float unpaired = 0.05;
 
         CUDAFLAGS static int base_score(const char &a, const char &b); //'alpha' score
         CUDAFLAGS static float match_score(const char &a, const char &b); // 'beta' score
