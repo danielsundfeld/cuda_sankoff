@@ -21,7 +21,9 @@ CUDAFLAGS inline int Cost::base_score(const char &a, const char &b)
     if ((a == 'C' && b == 'G') ||
         (a == 'G' && b == 'C') ||
         (a == 'A' && b == 'U') ||
-        (a == 'U' && b == 'A')
+        (a == 'U' && b == 'A') ||
+        (a == 'G' && b == 'U') ||
+        (a == 'U' && b == 'G')
        )
         return 1;
     return 0;
