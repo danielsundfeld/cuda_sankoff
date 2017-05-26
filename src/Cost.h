@@ -10,6 +10,7 @@ class Cost {
     public:
         static const float gap = -3;
         static const float unpaired = 0.05;
+        static const float match = 0.05;
 
         CUDAFLAGS static int base_score(const char &a, const char &b); //'alpha' score
         CUDAFLAGS static float match_score(const char &a, const char &b); // 'beta' score
@@ -33,7 +34,7 @@ CUDAFLAGS inline int Cost::base_score(const char &a, const char &b)
 CUDAFLAGS inline float Cost::match_score(const char &a, const char &b)
 {
     if (a == b)
-        return Cost::unpaired;
+        return Cost::match;
     return 0;
 }
 
@@ -41,7 +42,7 @@ CUDAFLAGS inline int Cost::compensation_score(const char &a1, const char &a2, co
 {
     // Give a score if they have the same structure
     if (base_score(a1, a2) == base_score(b1, b2))
-        return 0; //TODO: FIXME 2 * match; //4 nucleotides, 2 matches...
+        return Cost::match; //4 nucleotides, 2 matches...
     return 0; // Otherwise, no donuts for you
 }
 #endif
