@@ -14,7 +14,6 @@ class Backtrace {
         void print(std::string &alignment_s1, std::string &alignment_structure, std::string &alignment_s2);
 
     private:
-        void add_last(const dp_matrix_cell c);
         dp_matrix_cell get_parent(const dp_matrix_cell c);
         void calculate_mb_position(float score);
         void do_backtrace_mb(int i, int j, int k, int l);

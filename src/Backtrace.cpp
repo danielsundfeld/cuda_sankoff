@@ -50,6 +50,7 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
             l -= 1;
             break;
 
+        case NullParent:
         case UnpairedIK:
             list_i.push_back(s1[i]);
             list_bp_left.push_back('.');
@@ -104,16 +105,6 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
     return dp_matrix->get_pos(i, j, k, l);
 }
 
-void Backtrace::add_last(const dp_matrix_cell c)
-{
-    if (c.parent != NullParent)
-        return;
-
-    list_i.push_back(s1[i]);
-    list_k.push_back(s2[k]);
-    list_bp_left.push_back('.');
-}
-
 void print_list(const std::string &list, std::string &st)
 {
     st.append(list);
@@ -151,7 +142,7 @@ void Backtrace::do_backtrace_mb(int i, int j, int k, int l)
 void Backtrace::run()
 {
     dp_matrix_cell c = dp_matrix->get_pos(i, j, k, l);
-    while (dp_matrix->check_border(i, j, k, l) && c.parent != NullParent && c.parent != Multibranch)
+    while (dp_matrix->check_border(i, j, k, l) && c.parent != Multibranch)
     {
         //printf("%f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
         c = get_parent(c);
@@ -165,8 +156,6 @@ void Backtrace::run()
         do_backtrace_mb(i, m, k, n);
         return;
     }
-    else
-        add_last(c);
     //printf("Fim: %f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
 }
 
