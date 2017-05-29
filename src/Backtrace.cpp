@@ -105,11 +105,6 @@ dp_matrix_cell Backtrace::get_parent(const dp_matrix_cell c)
     return dp_matrix->get_pos(i, j, k, l);
 }
 
-void print_list(const std::string &list, std::string &st)
-{
-    st.append(list);
-}
-
 void Backtrace::calculate_mb_position(float score)
 {
     for (m = i + 1; m < j; ++m)
@@ -161,10 +156,10 @@ void Backtrace::run()
 
 void Backtrace::print(std::string &alignment_s1, std::string &alignment_structure, std::string &alignment_s2)
 {
-    print_list(list_i, alignment_s1);
-    print_list(list_j, alignment_s1);
-    print_list(list_bp_left, alignment_structure);
-    print_list(list_bp_right, alignment_structure);
-    print_list(list_k, alignment_s2);
-    print_list(list_l, alignment_s2);
+    alignment_s1.append(list_i);
+    alignment_s1.append(list_j);
+    alignment_structure.append(list_bp_left);
+    alignment_structure.append(list_bp_right);
+    alignment_s2.append(list_k);
+    alignment_s2.append(list_l);
 }
