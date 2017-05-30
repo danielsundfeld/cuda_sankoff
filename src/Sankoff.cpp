@@ -90,7 +90,7 @@ void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
 
 void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 {
-    if (score2.score > score1.score || (score1.parent == NullParent && score2.parent != NullParent))
+    if (score2.score > score1.score || (score1.parent == NullParent))
     {
         score1.score = score2.score;
         score1.parent = parent;
@@ -99,6 +99,9 @@ void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 
 void Sankoff::calculate_pos(dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent)
 {
+    if (dp_matrix.check_border(i, j, k, l) == false)
+        return;
+
     dp_matrix_cell score2(dp_matrix.get_pos(i, j, k, l));
     score2.score += extra_score;
     max(score1, score2, parent);

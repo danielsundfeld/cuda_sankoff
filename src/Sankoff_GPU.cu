@@ -68,7 +68,7 @@ void copy_dp_matrix_from_gpu(dp_matrix_cell *h_dp_matrix, dp_matrix_cell *d_dp_m
 
 __device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 {
-    if (score2.score > score1.score || (score1.parent == NullParent && score2.parent != NullParent))
+    if (score2.score > score1.score || (score1.parent == NullParent))
     {
         score1.score = score2.score;
         score1.parent = parent;
@@ -77,6 +77,9 @@ __device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 
 __device__ void calculate_pos(dp_matrix_cell *dp_matrix, sequences* seq_ctx, dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent)
 {
+    if (dp_matrix_check_border(i, j, k, l, seq_ctx) == false)
+        return;
+
     dp_matrix_cell score2(dp_matrix_get_pos(dp_matrix, i, j, k, l, seq_ctx));
     score2.score += extra_score;
     max(score1, score2, parent);
