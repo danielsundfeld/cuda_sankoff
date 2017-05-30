@@ -57,7 +57,6 @@ COMMON_SRCS += \
 
 CPU_SANK_SRCS += \
     $(SRC_DIR)/sankoff_cpu_main.cpp \
-    $(SRC_DIR)/Foldalign.cpp \
     $(SRC_DIR)/Sankoff.cpp \
 
 GPU_CPP_SANK_SRCS += \

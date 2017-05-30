@@ -88,14 +88,32 @@ void Sankoff::print_mb_dep(int i, int j, int k, int l, int m, int n) const
         << m + 1 << " " << j << " " << n + 1 << " " << l << "\n";
 }
 
-void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score, int parent)
+void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 {
-    score2.score += extra_score;
     if (score2.score > score1.score || (score1.parent == NullParent && score2.parent != NullParent))
     {
         score1.score = score2.score;
         score1.parent = parent;
     }
+}
+
+void Sankoff::calculate_pos(dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent)
+{
+    dp_matrix_cell score2 = dp_matrix.get_pos(i, j, k, l);
+    score2.score += extra_score;
+    max(score1, score2, parent);
+}
+
+void Sankoff::calculate_pos_mb(dp_matrix_cell &score1, int i, int j, int k, int l, int m, int n)
+{
+    dp_matrix_cell mb_right = dp_matrix.get_pos(m + 1, j, n + 1, l);
+    if (mb_right.parent != Paired)
+        return;
+
+    dp_matrix_cell mb_left;
+    mb_left.score = dp_matrix.get_pos(i, m, k, n).score + mb_right.score;
+    mb_left.parent = Multibranch;
+    max(score1, mb_left, Multibranch);
 }
 
 void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
@@ -119,15 +137,15 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
      * - Torarinsson, et al. "Multiple structural alignment and clustering of RNA sequences
      * - Ziv-Ukelson, et al. "A faster algorithm for RNA co-folding"
     */
-    max(score, dp_matrix.get_pos(i + 1, j, k, l), Cost::gap, GapI);
-    max(score, dp_matrix.get_pos(i, j, k + 1, l), Cost::gap, GapK);
-    max(score, dp_matrix.get_pos(i, j - 1, k, l), Cost::gap, GapJ);
-    max(score, dp_matrix.get_pos(i, j, k, l - 1), Cost::gap, GapL);
-    max(score, dp_matrix.get_pos(i + 1, j, k + 1, l), Cost::match_score(s1[i], s2[k]), UnpairedIK);
-    max(score, dp_matrix.get_pos(i, j - 1, k, l - 1), Cost::match_score(s1[j], s2[l]), UnpairedJL);
-    max(score, dp_matrix.get_pos(i + 1, j - 1, k, l), s1_score + Cost::gap * 2, PairedGapS1);
-    max(score, dp_matrix.get_pos(i, j, k + 1, l - 1), s2_score + Cost::gap * 2, PairedGapS2);
-    max(score, dp_matrix.get_pos(i + 1, j - 1, k + 1, l - 1), s1_score + s2_score +
+    calculate_pos(score, i + 1, j, k, l, Cost::gap, GapI);
+    calculate_pos(score, i, j, k + 1, l, Cost::gap, GapK);
+    calculate_pos(score, i, j - 1, k, l, Cost::gap, GapJ);
+    calculate_pos(score, i, j, k, l - 1, Cost::gap, GapL);
+    calculate_pos(score, i + 1, j, k + 1, l, Cost::match_score(s1[i], s2[k]), UnpairedIK);
+    calculate_pos(score, i, j - 1, k, l - 1, Cost::match_score(s1[j], s2[l]), UnpairedJL);
+    calculate_pos(score, i + 1, j - 1, k, l, s1_score + Cost::gap * 2, PairedGapS1);
+    calculate_pos(score, i, j, k + 1, l - 1, s2_score + Cost::gap * 2, PairedGapS2);
+    calculate_pos(score, i + 1, j - 1, k + 1, l - 1, s1_score + s2_score +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]), Paired);
 
     for (int m = i + 1; m < j; ++m)
@@ -135,15 +153,7 @@ void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
         for (int n = k + 1; n < l; ++n)
         {
             print_mb_dep(i, j, k, l, m, n);
-
-            dp_matrix_cell mb_right = dp_matrix.get_pos(m + 1, j, n + 1, l);
-            if (mb_right.parent != Paired)
-                continue;
-
-            dp_matrix_cell mb_left;
-            mb_left.score = dp_matrix.get_pos(i, m, k, n).score + mb_right.score;
-            mb_left.parent = Multibranch;
-            max(score, mb_left, 0, Multibranch);
+            calculate_pos_mb(score, i, j, k, l, m, n);
         } //n
     } //m
 

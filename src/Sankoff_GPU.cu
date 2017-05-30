@@ -66,14 +66,32 @@ void copy_dp_matrix_from_gpu(dp_matrix_cell *h_dp_matrix, dp_matrix_cell *d_dp_m
     }
 }
 
-__device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score, int parent)
+__device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 {
-    score2.score += extra_score;
     if (score2.score > score1.score || (score1.parent == NullParent && score2.parent != NullParent))
     {
         score1.score = score2.score;
         score1.parent = parent;
     }
+}
+
+__device__ void calculate_pos(dp_matrix_cell *dp_matrix, sequences* seq_ctx, dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent)
+{
+    dp_matrix_cell score2 = dp_matrix_get_pos(dp_matrix, i, j, k, l, seq_ctx);
+    score2.score += extra_score;
+    max(score1, score2, parent);
+}
+
+__device__ void calculate_pos_mb(dp_matrix_cell *dp_matrix, sequences* seq_ctx, dp_matrix_cell &score1, int i, int j, int k, int l, int m, int n)
+{
+    dp_matrix_cell mb_right = dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx);
+    if (mb_right.parent != Paired)
+        return;
+
+    dp_matrix_cell mb_left;
+    mb_left.score = dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx).score + mb_right.score;
+    mb_left.parent = Multibranch;
+    max(score1, mb_left, Multibranch);
 }
 
 //! Expand one cell with position \a i, \a j, \a k, \a l
@@ -89,29 +107,22 @@ __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, 
     float s1_score = Cost::base_score(s1[i], s1[j]) ? bp1->m[i+1][j+1] : -1024;
     float s2_score = Cost::base_score(s2[k], s2[l]) ? bp2->m[k+1][l+1] : -1024;
 
-    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k, l, seq_ctx), Cost::gap, GapI);
-    max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l, seq_ctx), Cost::gap, GapK);
-    max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l, seq_ctx), Cost::gap, GapJ);
-    max(score, dp_matrix_get_pos(dp_matrix, i, j, k, l - 1, seq_ctx), Cost::gap, GapL);
-    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j, k + 1, l, seq_ctx), Cost::match_score(s1[i], s2[k]), UnpairedIK);
-    max(score, dp_matrix_get_pos(dp_matrix, i, j - 1, k, l - 1, seq_ctx), Cost::match_score(s1[j], s2[l]), UnpairedJL);
-    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k, l, seq_ctx), s1_score + Cost::gap * 2, PairedGapS1);
-    max(score, dp_matrix_get_pos(dp_matrix, i, j, k + 1, l - 1, seq_ctx), s2_score + Cost::gap * 2, PairedGapS2);
-    max(score, dp_matrix_get_pos(dp_matrix, i + 1, j - 1, k + 1, l - 1, seq_ctx), s1_score + s2_score +
+    calculate_pos(dp_matrix, seq_ctx, score, i + 1, j, k, l, Cost::gap, GapI);
+    calculate_pos(dp_matrix, seq_ctx, score, i, j, k + 1, l, Cost::gap, GapK);
+    calculate_pos(dp_matrix, seq_ctx, score, i, j - 1, k, l, Cost::gap, GapJ);
+    calculate_pos(dp_matrix, seq_ctx, score, i, j, k, l - 1, Cost::gap, GapL);
+    calculate_pos(dp_matrix, seq_ctx, score, i + 1, j, k + 1, l, Cost::match_score(s1[i], s2[k]), UnpairedIK);
+    calculate_pos(dp_matrix, seq_ctx, score, i, j - 1, k, l - 1, Cost::match_score(s1[j], s2[l]), UnpairedJL);
+    calculate_pos(dp_matrix, seq_ctx, score, i + 1, j - 1, k, l, s1_score + Cost::gap * 2, PairedGapS1);
+    calculate_pos(dp_matrix, seq_ctx, score, i, j, k + 1, l - 1, s2_score + Cost::gap * 2, PairedGapS2);
+    calculate_pos(dp_matrix, seq_ctx, score, i + 1, j - 1, k + 1, l - 1, s1_score + s2_score +
             Cost::compensation_score(s1[i], s1[j], s2[k], s2[l]), Paired);
 
     for (int m = i + 1; m < j; ++m)
     {
         for (int n = k + 1; n < l; ++n)
         {
-            dp_matrix_cell mb_right = dp_matrix_get_pos(dp_matrix, m + 1, j, n + 1, l, seq_ctx);
-            if (mb_right.parent != Paired)
-                continue;
-
-            dp_matrix_cell mb_left;
-            mb_left.score = dp_matrix_get_pos(dp_matrix, i, m, k, n, seq_ctx).score + mb_right.score;
-            mb_left.parent = Multibranch;
-            max(score, mb_left, 0, Multibranch);
+            calculate_pos_mb(dp_matrix, seq_ctx, score, i, j, k, l, m, n);
         } //n
     } //m
 

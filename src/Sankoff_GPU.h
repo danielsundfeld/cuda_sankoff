@@ -28,7 +28,9 @@ class Sankoff_GPU {
 };
 
 #ifdef __CUDACC__
-__device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, float extra_score, int parent);
+__device__ void max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent);
+__device__ void calculate_pos(dp_matrix_cell *dp_matrix, sequences* seq_ctx, dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent);
+__device__ void calculate_pos_mb(dp_matrix_cell *dp_matrix, sequences* seq_ctx, dp_matrix_cell &score1, int i, int j, int k, int l, int m, int n);
 __device__ void sankoff_gpu_expand_inner_matrix_diag(dp_matrix_cell *dp_matrix, const int &i, const int &k, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
 __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, const int &j, const int &k, const int &l, sequences* seq_ctx, struct bp_prob* bp1, struct bp_prob* bp2);
 
