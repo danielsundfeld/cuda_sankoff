@@ -99,21 +99,23 @@ void Sankoff::max(dp_matrix_cell &score1, dp_matrix_cell score2, int parent)
 
 void Sankoff::calculate_pos(dp_matrix_cell &score1, int i, int j, int k, int l, float extra_score, int parent)
 {
-    dp_matrix_cell score2 = dp_matrix.get_pos(i, j, k, l);
+    dp_matrix_cell score2(dp_matrix.get_pos(i, j, k, l));
     score2.score += extra_score;
     max(score1, score2, parent);
 }
 
 void Sankoff::calculate_pos_mb(dp_matrix_cell &score1, int i, int j, int k, int l, int m, int n)
 {
-    dp_matrix_cell mb_right = dp_matrix.get_pos(m + 1, j, n + 1, l);
+    dp_matrix_cell mb_right(dp_matrix.get_pos(m + 1, j, n + 1, l));
     if (mb_right.parent != Paired)
         return;
 
-    dp_matrix_cell mb_left;
-    mb_left.score = dp_matrix.get_pos(i, m, k, n).score + mb_right.score;
-    mb_left.parent = Multibranch;
-    max(score1, mb_left, Multibranch);
+    dp_matrix_cell mb_left(dp_matrix.get_pos(i, m, k, n));
+    dp_matrix_cell mb;
+    mb.score = mb_left.score + mb_right.score;
+    mb.parent = Multibranch;
+
+    max(score1, mb, Multibranch);
 }
 
 void Sankoff::expand_pos(const int &i, const int &j, const int &k, const int &l)
