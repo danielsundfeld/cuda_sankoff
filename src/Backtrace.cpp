@@ -128,9 +128,9 @@ void Backtrace::do_backtrace_mb(int i, int j, int k, int l)
     mb_bc->run();
     mb_bc->print(temp_s1, temp_structure, temp_s2);
 
-    list_i.insert(0, temp_s1);
-    list_bp_left.insert(0, temp_structure);
-    list_k.insert(0, temp_s2);
+    list_i.append(temp_s1);
+    list_bp_left.append(temp_structure);
+    list_k.append(temp_s2);
     delete mb_bc;
 }
 
@@ -147,8 +147,8 @@ void Backtrace::run()
         calculate_mb_position(c.score);
         //printf("(%d %d %d %d) = (%d %d %d %d) + (%d %d %d %d)\n", i, j, k, l, i, m, k, n, m + 1, j, n + 1, l);
 
-        do_backtrace_mb(m + 1, j, n + 1, l);
         do_backtrace_mb(i, m, k, n);
+        do_backtrace_mb(m + 1, j, n + 1, l);
         return;
     }
     //printf("Fim: %f (%s) - %d %d %d %d\n", c.score, parent_str[(int)c.parent], i, k, j, l);
