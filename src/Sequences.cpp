@@ -16,7 +16,10 @@ Sequences Sequences::instance;
 //! Save the string \a x as an Sequence
 int Sequences::set_seq(const std::string &x)
 {
-    seqs.push_back(x);
+    if (n_seq && seqs[0].length() < x.length())
+        seqs.insert(seqs.begin(), x);
+    else
+        seqs.push_back(x);
     ++n_seq;
     return n_seq;
 }
