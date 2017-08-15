@@ -111,6 +111,10 @@ __device__ void sankoff_gpu_expand_pos(dp_matrix_cell *dp_matrix, const int &i, 
 
     float s1_score = Cost::base_score(s1[i], s1[j]) ? bp1->m[i+1][j+1] : -1024;
     float s2_score = Cost::base_score(s2[k], s2[l]) ? bp2->m[k+1][l+1] : -1024;
+    if (s1_score == 0)
+        s1_score = -1024;
+    if (s2_score == 0)
+        s2_score = -1024;
 
     calculate_pos(dp_matrix, seq_ctx, score, i + 1, j, k, l, Cost::gap, GapI);
     calculate_pos(dp_matrix, seq_ctx, score, i, j, k + 1, l, Cost::gap, GapK);
