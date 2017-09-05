@@ -10,7 +10,7 @@
 
 class Cost {
     public:
-        static const float gap = -8;
+        static const float gap = -13;
         static const float unpaired = 5;
         static const float match = 0.05;
 
