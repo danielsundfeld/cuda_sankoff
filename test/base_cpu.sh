@@ -3,10 +3,10 @@
 #SBATCH -p RM
 #SBATCH --ntasks-per-node 28
 #SBATCH -t 5:00:00
-SEQ="./seqs/RFAM/RF02514.fasta"
-CMD="./bin/sankoff"
-OPT="-t 16"
-OUT="cpu16"
+SEQ="__SEQ__"
+CMD="__CMD__"
+OPT="__OPT__"
+OUT="__OUT__"
 
 module avail cuda
 module load cuda

@@ -9,7 +9,7 @@ for i in ../seqs/RFAM*/*fasta; do
     sed -i "s/__OUT__/gpu/" $FILE
 
     FILE="${NAME}_1_cpu.sh"
-    cp base.sh $FILE
+    cp base_cpu.sh $FILE
     OUT=$(echo ${i:1} | sed 's/\//\\\//g')
     sed -i "s/__SEQ__/$OUT/" $FILE
     sed -i "s/__CMD__/.\/bin\/sankoff/" $FILE
@@ -17,7 +17,7 @@ for i in ../seqs/RFAM*/*fasta; do
     sed -i "s/__OUT__/cpu1/" $FILE
     
     FILE="${NAME}_16_cpu.sh"
-    cp base.sh $FILE
+    cp base_cpu.sh $FILE
     OUT=$(echo ${i:1} | sed 's/\//\\\//g')
     sed -i "s/__SEQ__/$OUT/" $FILE
     sed -i "s/__CMD__/.\/bin\/sankoff/" $FILE

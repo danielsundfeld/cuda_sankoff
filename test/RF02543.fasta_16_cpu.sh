@@ -1,9 +1,8 @@
 #!/bin/bash
-#SBATCH -N 2
-#SBATCH -p GPU
+#SBATCH -N 1
+#SBATCH -p RM
 #SBATCH --ntasks-per-node 28
 #SBATCH -t 5:00:00
-#SBATCH --gres=gpu:p100:2
 SEQ="./seqs/RFAM/RF02543.fasta"
 CMD="./bin/sankoff"
 OPT="-t 16"
