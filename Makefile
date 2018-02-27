@@ -11,8 +11,8 @@ OBJ_DIR     = ./obj
 CPPFLAGS   += -W -Wall -fopenmp
 LDFLAGS    += -fopenmp -lstdc++ -lm
 
-GPUFLAGS   += -dc -arch sm_30
-GPULDFLAGS   += -link -arch sm_30
+GPUFLAGS   += -dc -arch sm_52
+GPULDFLAGS   += -link -arch sm_52
 
 VIENNA_LIB  = ./ViennaRNA-2.3.3/src/ViennaRNA/libRNA.a
 
