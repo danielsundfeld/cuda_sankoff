@@ -242,6 +242,7 @@ int Sankoff_GPU::diag_sankoff()
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase1<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx, d_bp1, d_bp2);
+        cudaDeviceSynchronize();
     }
 
     // Second wave, from the main diagonal to the end
@@ -250,6 +251,7 @@ int Sankoff_GPU::diag_sankoff()
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx, d_bp1, d_bp2);
+        cudaDeviceSynchronize();
     } //outer_diag
     std::cout << "Score: " << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, &h_seq_ctx) << std::endl;
 
