@@ -53,6 +53,7 @@ Usually the default options are the best to run. You can change and check more a
 
 ## Cite us
 D. Sundfeld, G. Teodoro, J. H. Havgaard, J. Gorodkin, and A. C. M. A. Melo. Using GPU to accelerate the pairwise structural RNA alignment with base pair probabilities. *Concurrency and computation practice and experience*, Accepted, 2019. 
+
 D. Sundfeld, J. H. Havgaard, J. Gorodkin, and A. C. M. A. Melo. CUDA-Sankoff: Using GPU to accelerate the pairwise structural RNA alignment. In *25th Euromicro International Conference on Parallel, Distributed and Network-based Processing, PDP 2017, 2017*, pages 295–302, 2017. 
 
 ## License
