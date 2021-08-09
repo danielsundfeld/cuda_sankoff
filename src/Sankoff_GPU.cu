@@ -56,6 +56,11 @@ void Sankoff_GPU::check_gpu_code(cudaError_t code)
     }
 }
 
+void Sankoff_GPU::check_kernel_execution()
+{
+    check_gpu_code(cudaGetLastError());
+}
+
 void copy_dp_matrix_from_gpu(dp_matrix_cell *h_dp_matrix, dp_matrix_cell *d_dp_matrix, long long int size)
 {
     cudaError_t code = cudaMemcpy(h_dp_matrix, d_dp_matrix, sizeof(dp_matrix_cell) * size, cudaMemcpyDeviceToHost);
@@ -242,7 +247,7 @@ int Sankoff_GPU::diag_sankoff()
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase1<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx, d_bp1, d_bp2);
-        //cudaDeviceSynchronize();
+        check_kernel_execution();
     }
 
     // Second wave, from the main diagonal to the end
@@ -251,7 +256,7 @@ int Sankoff_GPU::diag_sankoff()
         ++threads_num;
         dim3 tn = ceil((float)threads_num/2);
         sankoff_gpu_expand_outer_matrix_diagonal_phase2<<<outer_diag + 1, tn>>>(dp_matrix, outer_diag, d_seq_ctx, d_bp1, d_bp2);
-        //cudaDeviceSynchronize();
+        check_kernel_execution();
     } //outer_diag
     cudaDeviceSynchronize();
     std::cout << "Score: " << dp_matrix_get_val(dp_matrix, 0, h_seq_ctx.s1_l - 1, 0, h_seq_ctx.s2_l - 1, &h_seq_ctx) << std::endl;

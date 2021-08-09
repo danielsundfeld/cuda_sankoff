@@ -10,12 +10,13 @@ class Sankoff_GPU {
     public:
         Sankoff_GPU(const std::string &seq1, const std::string &seq2);
         virtual ~Sankoff_GPU();
-#ifdef __CUDACC__
-        void check_gpu_code(cudaError_t code);
-#endif
         int diag_sankoff(); //Run a pure sankoff algorithm
 
     private:
+#ifdef __CUDACC__
+        void check_kernel_execution();
+        void check_gpu_code(cudaError_t code);
+#endif
         void backtrace();
         //host members
         sequences h_seq_ctx;
